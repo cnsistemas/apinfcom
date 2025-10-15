@@ -1,0 +1,29 @@
+*   Trying 200.233.4.177:443...
+* Connected to nfcom-homologacao.svrs.rs.gov.br (200.233.4.177) port 443 (#0)
+* ALPN, offering http/1.1
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server did not agree to a protocol
+* Server certificate:
+*  subject: C=BR; ST=RS; L=PORTO ALEGRE; O=PROCERGS - CENTRO DE TECNOLOGIA DA INFORMACAO E COMUNICACAO DO E; serialNumber=87124582000104; CN=*.svrs.rs.gov.br; businessCategory=Business Entity; jurisdictionC=BR
+*  start date: Aug  6 19:27:50 2024 GMT
+*  expire date: Aug  6 19:27:50 2025 GMT
+*  issuer: C=BR; O=ICP-Brasil; OU=Autoridade Certificadora Raiz Brasileira v10; CN=Autoridade Certificadora do SERPRO SSLv1
+*  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+> POST /WS/NFComRecepcao/NFComRecepcao.asmx HTTP/1.1
+Host: nfcom-homologacao.svrs.rs.gov.br
+Accept: */*
+Content-Type: application/soap+xml; charset=utf-8; action="http://www.portalfiscal.inf.br/nfcom/wsdl/NFComRecepcao/nfcomRecepcao"
+SOAPAction: "http://www.portalfiscal.inf.br/nfcom/wsdl/NFComRecepcao/nfcomRecepcao"
+Content-Length: 4301
+
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 400 Bad Request
+< Cache-Control: private
+< Content-Type: application/soap+xml; charset=utf-8
+< Server: Microsoft-IIS/10.0
+< X-AspNet-Version: 4.0.30319
+< X-Powered-By: ASP.NET
+< Date: Tue, 27 May 2025 17:37:30 GMT
+< Content-Length: 0
+< 
+* Connection #0 to host nfcom-homologacao.svrs.rs.gov.br left intact

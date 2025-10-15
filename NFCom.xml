@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFCom xmlns="http://www.portalfiscal.inf.br/nfcom">
+  <infNFCom Id="NFCom35123456789012345678901234567890123456789012" versao="1.00">
+    <ide>
+      <cUF>35</cUF>
+      <tpAmb>2</tpAmb>
+      <mod>62</mod>
+      <serie>1</serie>
+      <nNF>22</nNF>
+      <cNF>92229986</cNF>
+      <cDV>9</cDV>
+      <dhEmi>2021-04-26T17:20:47-03:00</dhEmi>
+      <tpEmis>1</tpEmis>
+      <nSiteAutoriz>12345678901234</nSiteAutoriz>
+      <cMunFG>3550308</cMunFG>
+      <finNFCom>0</finNFCom>
+      <tpFat>0</tpFat>
+      <verProc>4.13</verProc>
+      <indPrePago>N</indPrePago>
+      <indCessaoMeiosRede>N</indCessaoMeiosRede>
+      <indNotaEntrada>N</indNotaEntrada>
+      <dhCont>2021-04-26T17:20:47-03:00</dhCont>
+      <xJust>Justificativa da entrada em contingência</xJust>
+      <tpNF>1</tpNF>
+      <idDest>1</idDest>
+      <tpImp>1</tpImp>
+      <finNF>1</finNF>
+      <indFinal>0</indFinal>
+      <indPres>9</indPres>
+      <procEmi>0</procEmi>
+    </ide>
+    <emit>
+      <CNPJ>52567322000119</CNPJ>
+      <IE>113421114210</IE>
+      <IEUFDest>113421114210</IEUFDest>
+      <CRT>3</CRT>
+      <xNome>FAKE LTDA</xNome>
+      <enderEmit>
+        <xLgr>RUA DOS ANONIMOS</xLgr>
+        <nro>100</nro>
+        <xCpl>SALA 2</xCpl>
+        <xBairro>IPIRANGA</xBairro>
+        <cMun>3550308</cMun>
+        <xMun>SAO PAULO</xMun>
+        <CEP>04207132</CEP>
+        <UF>SP</UF>
+        <fone>1120555555</fone>
+        <email>contato@fake.com.br</email>
+      </enderEmit>
+    </emit>
+    <dest>
+      <xNome>NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL</xNome>
+      <CNPJ>07677840000131</CNPJ>
+      <indIEDest>1</indIEDest>
+      <enderDest>
+        <xLgr>RUA UM</xLgr>
+        <nro>323</nro>
+        <xBairro>BRAS</xBairro>
+        <cMun>3550308</cMun>
+        <xMun>SAO PAULO</xMun>
+        <CEP>03040210</CEP>
+        <UF>SP</UF>
+        <fone>99999999</fone>
+        <email>seila@seila.com.br</email>
+      </enderDest>
+    </dest>
+    <assinante>
+      <iCodAssinante>123456</iCodAssinante>
+      <tpAssinante>1</tpAssinante>
+      <tpServUtil>4</tpServUtil>
+    </assinante>
+    <det nItem="1">
+      <prod>
+        <cProd>1234</cProd>
+        <xProd>DALIA</xProd>
+        <cClass>0000001</cClass>
+        <CFOP>5307</CFOP>
+        <uMed>4</uMed>
+        <qFaturada>1.0000</qFaturada>
+        <vItem>15.00</vItem>
+        <vProd>15.00</vProd>
+      </prod>
+      <imposto>
+        <ICMS00>
+          <CST>00</CST>
+          <vBC>15.00</vBC>
+          <pICMS>18.00</pICMS>
+          <vICMS>2.70</vICMS>
+        </ICMS00>
+      </imposto>
+    </det>
+    <total>
+      <vProd>15.00</vProd>
+      <ICMSTot>
+        <vBC>15.00</vBC>
+        <vICMS>2.70</vICMS>
+        <vICMSDeson>0.00</vICMSDeson>
+        <vFCP>0.00</vFCP>
+        <vIPIDevol>0.00</vIPIDevol>
+        <vPIS>0.25</vPIS>
+        <vCOFINS>1.14</vCOFINS>
+        <vOutro>0.00</vOutro>
+        <vNF>15.00</vNF>
+      </ICMSTot>
+      <vCOFINS>1.14</vCOFINS>
+      <vPIS>0.25</vPIS>
+      <vFUNTTEL>0.00</vFUNTTEL>
+      <vFUST>0.00</vFUST>
+      <vRetTribTot>
+        <vRetPIS>0.00</vRetPIS>
+        <vRetCofins>0.00</vRetCofins>
+        <vRetCSLL>0.00</vRetCSLL>
+        <vIRRF>0.00</vIRRF>
+      </vRetTribTot>
+      <vDesc>0.00</vDesc>
+      <vOutro>0.00</vOutro>
+      <vNF>15.00</vNF>
+    </total>
+    <gFat>
+      <CompetFat>202104</CompetFat>
+      <dVencFat>2021-04-26</dVencFat>
+      <codBarras>123456789012345678901234567890123456789012345678</codBarras>
+    </gFat>
+    <infAdic>
+      <infAdFisco>SAIDA COM SUSPENSAO DO IPI CONFORME ART 29 DA LEI 10.637 BC RED EM 33,33% CFE ART 52, ANEXO II RICMS/00 E DECRETO 62.560 de 05-05-2017</infAdFisco>
+      <infCpl>Informações complementares de interesse do Contribuinte</infCpl>
+    </infAdic>
+    <gRespTec>
+      <CNPJ>52567322000119</CNPJ>
+      <xContato>Fulano de Tal</xContato>
+      <email>fulano@fake.com.br</email>
+      <fone>1120555555</fone>
+    </gRespTec>
+  </infNFCom>
+  <infNFComSupl>
+    <qrCodNFCom>https://nfcom.fazenda.gov.br/QRCode?p=35123456789012345678901234567890123456789012|1.00|1|1|12345678901234</qrCodNFCom>
+  </infNFComSupl>
+  <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo>
+      <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+      <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+      <Reference URI="#NFCom35123456789012345678901234567890123456789012">
+        <Transforms>
+          <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+        </Transforms>
+        <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+        <DigestValue>1234567890abcdef1234567890abcdef12345678</DigestValue>
+      </Reference>
+    </SignedInfo>
+    <SignatureValue>1234567890abcdef1234567890abcdef12345678</SignatureValue>
+    <KeyInfo>
+      <X509Data>
+        <X509Certificate>1234567890abcdef1234567890abcdef12345678</X509Certificate>
+      </X509Data>
+    </KeyInfo>
+  </Signature>
+</NFCom> 

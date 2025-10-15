@@ -1,0 +1,864 @@
+================================================================================
+                    ESPECIFICAÇÃO COMPLETA - SISTEMA DE GESTÃO NFCOM
+================================================================================
+
+Data: 2024
+Versão: 1.0
+Autor: Sistema de Gestão NFCom
+
+================================================================================
+                                SUMÁRIO
+================================================================================
+
+1. VISÃO GERAL DO SISTEMA
+2. MÓDULOS E FUNCIONALIDADES
+3. CADASTROS NECESSÁRIOS
+4. FLUXOS DE TRABALHO
+5. INTEGRAÇÕES
+6. RELATÓRIOS
+7. SEGURANÇA E AUDITORIA
+8. CONFIGURAÇÕES TÉCNICAS
+9. INTERFACE DO USUÁRIO
+10. MONITORAMENTO E SUPORTE
+
+================================================================================
+                        1. VISÃO GERAL DO SISTEMA
+================================================================================
+
+O Sistema de Gestão NFCom é uma aplicação web completa para gerenciamento de 
+Notas Fiscais de Comunicação (NFCom), integrando-se com a API PHP existente 
+para comunicação com a SEFAZ.
+
+OBJETIVOS:
+- Automatizar o processo de emissão de NFCom
+- Centralizar o controle de todas as operações fiscais
+- Garantir conformidade com a legislação
+- Facilitar a gestão de certificados digitais
+- Fornecer relatórios e análises completas
+
+PÚBLICO-ALVO:
+- Empresas de telecomunicações
+- Prestadores de serviços de comunicação
+- Contadores e escritórios contábeis
+- Consultores fiscais
+
+================================================================================
+                        2. MÓDULOS E FUNCIONALIDADES
+================================================================================
+
+2.1 MÓDULO DE AUTENTICAÇÃO E SEGURANÇA
+----------------------------------------
+
+FUNCIONALIDADES:
+- Login/logout com usuário e senha
+- Gestão de tokens JWT (armazenamento e renovação automática)
+- Controle de acesso por perfil de usuário (Administrador, Operador, Consultor)
+- Auditoria completa de ações dos usuários
+- Recuperação de senha
+- Bloqueio de conta após tentativas falhadas
+- Sessões com timeout configurável
+
+PERFIS DE USUÁRIO:
+- Administrador: Acesso total ao sistema
+- Operador: Emissão, consulta e cancelamento de NFCom
+- Consultor: Apenas consultas e relatórios
+
+2.2 MÓDULO DE CADASTRO DE EMPRESAS/EMITENTES
+----------------------------------------------
+
+CAMPOS OBRIGATÓRIOS:
+- CNPJ (com validação automática)
+- Razão Social
+- Nome Fantasia
+- Inscrição Estadual
+- Endereço completo:
+  * Logradouro
+  * Número
+  * Complemento (opcional)
+  * Bairro
+  * Cidade
+  * UF (com validação de sigla)
+  * CEP (com validação automática)
+- Telefone
+- Email
+- Senha do certificado digital
+- Certificado digital (.pfx)
+- Ambiente (homologação/produção)
+
+CAMPOS OPCIONAIS:
+- Site da empresa
+- Observações
+- Status (ativo/inativo)
+- Data de cadastro
+- Usuário responsável
+
+FUNCIONALIDADES:
+- Upload de certificado digital
+- Validação automática de certificado
+- Teste de conectividade com SEFAZ
+- Histórico de alterações
+- Backup de certificados
+
+2.3 MÓDULO DE CADASTRO DE DESTINATÁRIOS
+----------------------------------------
+
+CAMPOS OBRIGATÓRIOS:
+- CPF/CNPJ (com validação automática)
+- Nome/Razão Social
+- Tipo de pessoa (Física/Jurídica)
+- Endereço completo (mesma estrutura do emitente)
+- Telefone
+- Email
+
+CAMPOS OPCIONAIS:
+- Inscrição Estadual
+- Observações
+- Status (ativo/inativo)
+- Data de cadastro
+
+FUNCIONALIDADES:
+- Busca por CPF/CNPJ
+- Validação automática de dados
+- Importação em lote via Excel
+- Exportação de dados
+
+2.4 MÓDULO DE CADASTRO DE PRODUTOS/SERVIÇOS
+---------------------------------------------
+
+CAMPOS OBRIGATÓRIOS:
+- Código do produto/serviço
+- Descrição
+- Classificação fiscal (cClass)
+- CFOP
+- Unidade de medida
+- Valor unitário padrão
+- Alíquota de ICMS
+- Tipo de serviço
+
+CAMPOS OPCIONAIS:
+- Código NCM
+- Observações
+- Status (ativo/inativo)
+- Categoria
+
+FUNCIONALIDADES:
+- Categorização de produtos
+- Cálculo automático de impostos
+- Importação de tabelas fiscais
+- Validação de CFOP
+
+2.5 MÓDULO DE GESTÃO DE CERTIFICADOS DIGITAIS
+----------------------------------------------
+
+FUNCIONALIDADES:
+- Upload de certificados (.pfx)
+- Validação automática de certificados
+- Verificação de data de validade
+- Teste de conectividade com SEFAZ
+- Renovação automática de certificados próximos do vencimento
+- Histórico de certificados por empresa
+- Backup automático de certificados
+- Notificações de vencimento
+
+VALIDAÇÕES:
+- Formato do arquivo (.pfx)
+- Senha do certificado
+- CNPJ do certificado
+- Data de validade
+- Conectividade com SEFAZ
+
+2.6 MÓDULO DE EMISSÃO DE NFCOM
+--------------------------------
+
+FORMULÁRIO DE EMISSÃO:
+- Seleção do emitente
+- Seleção do destinatário
+- Adição de itens (produtos/serviços)
+- Cálculo automático de impostos
+- Código de barras (geração automática)
+- Mensagens complementares
+- Data de emissão
+- Observações
+
+VALIDAÇÕES ANTES DO ENVIO:
+- Dados obrigatórios preenchidos
+- Certificado válido
+- Conectividade com SEFAZ
+- Validação de CFOP
+- Validação de valores
+
+FUNCIONALIDADES:
+- Preview do XML gerado
+- Envio para SEFAZ
+- Processamento da resposta
+- Armazenamento do XML
+- Geração de PDF
+- Envio por email
+
+2.7 MÓDULO DE GESTÃO DE NFCOM EMITIDAS
+----------------------------------------
+
+LISTAGEM COM FILTROS:
+- Data de emissão (período)
+- Status (autorizada, cancelada, rejeitada, pendente)
+- Emitente
+- Destinatário
+- Chave de acesso
+- Valor total
+- Protocolo de autorização
+
+FUNCIONALIDADES:
+- Visualização detalhada de cada NFCom
+- Download do XML
+- Geração de PDF
+- Envio por email
+- Reimpressão
+- Consulta de status na SEFAZ
+
+STATUS POSSÍVEIS:
+- Pendente: Enviada, aguardando resposta
+- Autorizada: Aprovada pela SEFAZ
+- Rejeitada: Rejeitada pela SEFAZ
+- Cancelada: Cancelada pelo usuário
+- Erro: Erro na transmissão
+
+2.8 MÓDULO DE CANCELAMENTO DE NFCOM
+------------------------------------
+
+FUNCIONALIDADES:
+- Solicitação de cancelamento com justificativa
+- Aprovação de cancelamentos (se configurado)
+- Envio para SEFAZ
+- Confirmação de cancelamento
+- Histórico de cancelamentos
+
+CAMPOS OBRIGATÓRIOS:
+- Chave de acesso da NFCom
+- Protocolo de autorização
+- Justificativa do cancelamento
+- Data e hora do cancelamento
+- Usuário responsável
+
+2.9 MÓDULO DE CONSULTA DE NFCOM
+---------------------------------
+
+TIPOS DE CONSULTA:
+- Por chave de acesso
+- Por período
+- Por CNPJ
+- Por protocolo
+
+FUNCIONALIDADES:
+- Consulta direta na SEFAZ
+- Armazenamento de consultas
+- Histórico de consultas
+- Exportação de resultados
+
+================================================================================
+                        3. CADASTROS NECESSÁRIOS
+================================================================================
+
+3.1 TABELA DE USUÁRIOS
+-----------------------
+- id (PK)
+- nome
+- email
+- senha (criptografada)
+- perfil (admin, operador, consultor)
+- empresa_id (FK)
+- status (ativo/inativo)
+- data_cadastro
+- ultimo_acesso
+- tentativas_login
+
+3.2 TABELA DE EMPRESAS/EMITENTES
+---------------------------------
+- id (PK)
+- cnpj
+- razao_social
+- nome_fantasia
+- inscricao_estadual
+- logradouro
+- numero
+- complemento
+- bairro
+- cidade
+- uf
+- cep
+- telefone
+- email
+- senha_certificado
+- certificado_path
+- ambiente (homologacao/producao)
+- status
+- data_cadastro
+- usuario_id (FK)
+
+3.3 TABELA DE DESTINATÁRIOS
+----------------------------
+- id (PK)
+- cpf_cnpj
+- nome_razao_social
+- tipo_pessoa (F/J)
+- inscricao_estadual
+- logradouro
+- numero
+- complemento
+- bairro
+- cidade
+- uf
+- cep
+- telefone
+- email
+- observacoes
+- status
+- data_cadastro
+
+3.4 TABELA DE PRODUTOS/SERVIÇOS
+--------------------------------
+- id (PK)
+- codigo
+- descricao
+- classificacao_fiscal
+- cfop
+- unidade_medida
+- valor_unitario
+- aliquota_icms
+- tipo_servico
+- categoria
+- observacoes
+- status
+- data_cadastro
+
+3.5 TABELA DE CERTIFICADOS
+---------------------------
+- id (PK)
+- empresa_id (FK)
+- certificado_path
+- senha
+- data_validade
+- cnpj_certificado
+- status
+- data_upload
+- usuario_id (FK)
+
+3.6 TABELA DE NFCOM
+--------------------
+- id (PK)
+- empresa_id (FK)
+- destinatario_id (FK)
+- chave_acesso
+- protocolo
+- numero_nfcom
+- serie
+- data_emissao
+- valor_total
+- status
+- xml_original
+- xml_assinado
+- resposta_sefaz
+- observacoes
+- usuario_id (FK)
+- data_cadastro
+
+3.7 TABELA DE ITENS NFCOM
+--------------------------
+- id (PK)
+- nfcom_id (FK)
+- produto_id (FK)
+- numero_item
+- descricao
+- quantidade
+- valor_unitario
+- valor_total
+- cfop
+- classificacao_fiscal
+- base_calculo_icms
+- valor_icms
+- aliquota_icms
+
+3.8 TABELA DE CANCELAMENTOS
+----------------------------
+- id (PK)
+- nfcom_id (FK)
+- protocolo_cancelamento
+- justificativa
+- data_cancelamento
+- status
+- resposta_sefaz
+- usuario_id (FK)
+
+3.9 TABELA DE CONSULTAS
+------------------------
+- id (PK)
+- empresa_id (FK)
+- tipo_consulta
+- parametro_consulta
+- resultado
+- data_consulta
+- usuario_id (FK)
+
+3.10 TABELA DE LOGS
+--------------------
+- id (PK)
+- usuario_id (FK)
+- acao
+- tabela
+- registro_id
+- dados_anteriores
+- dados_novos
+- ip_usuario
+- data_hora
+
+================================================================================
+                        4. FLUXOS DE TRABALHO
+================================================================================
+
+4.1 FLUXO DE EMISSÃO DE NFCOM
+-------------------------------
+
+1. USUÁRIO ACESSA O SISTEMA
+   - Login com credenciais
+   - Validação de token JWT
+   - Carregamento do dashboard
+
+2. INICIA EMISSÃO
+   - Seleciona "Nova NFCom"
+   - Sistema carrega dados do usuário/empresa
+
+3. PREENCHIMENTO DOS DADOS
+   - Seleção do emitente (se múltiplas empresas)
+   - Seleção do destinatário
+   - Adição de itens (produtos/serviços)
+   - Preenchimento de dados complementares
+
+4. VALIDAÇÃO AUTOMÁTICA
+   - Verificação de dados obrigatórios
+   - Validação de certificado digital
+   - Cálculo automático de impostos
+   - Geração de chave de acesso
+
+5. PREVIEW E CONFIRMAÇÃO
+   - Visualização do XML gerado
+   - Confirmação dos dados
+   - Aprovação para envio
+
+6. ENVIO PARA SEFAZ
+   - Assinatura digital do XML
+   - Compactação do XML
+   - Envio via SOAP
+   - Aguardando resposta
+
+7. PROCESSAMENTO DA RESPOSTA
+   - Recebimento da resposta da SEFAZ
+   - Interpretação do status
+   - Armazenamento do XML
+   - Geração de PDF (se autorizada)
+
+8. NOTIFICAÇÃO E FINALIZAÇÃO
+   - Notificação do resultado
+   - Envio por email (se configurado)
+   - Registro no histórico
+   - Retorno ao dashboard
+
+4.2 FLUXO DE CANCELAMENTO
+--------------------------
+
+1. USUÁRIO SOLICITA CANCELAMENTO
+   - Localiza a NFCom na listagem
+   - Clica em "Cancelar"
+
+2. PREENCHIMENTO DA JUSTIFICATIVA
+   - Informa o motivo do cancelamento
+   - Confirma a ação
+
+3. APROVAÇÃO (SE CONFIGURADO)
+   - Sistema verifica se precisa de aprovação
+   - Envia para aprovação do administrador
+
+4. ENVIO PARA SEFAZ
+   - Gera XML de cancelamento
+   - Envia para SEFAZ
+   - Aguarda resposta
+
+5. CONFIRMAÇÃO
+   - Processa resposta da SEFAZ
+   - Atualiza status da NFCom
+   - Notifica o usuário
+
+4.3 FLUXO DE CONSULTA
+----------------------
+
+1. USUÁRIO ACESSA CONSULTA
+   - Seleciona tipo de consulta
+   - Preenche parâmetros
+
+2. EXECUÇÃO DA CONSULTA
+   - Sistema envia consulta para SEFAZ
+   - Aguarda resposta
+
+3. PROCESSAMENTO
+   - Interpreta resposta
+   - Armazena resultado
+   - Exibe para o usuário
+
+================================================================================
+                        5. INTEGRAÇÕES
+================================================================================
+
+5.1 INTEGRAÇÃO COM API EXISTENTE
+---------------------------------
+
+ENDPOINTS UTILIZADOS:
+- POST /login - Autenticação
+- POST /nfcom - Emissão
+- POST /nfcom/cancelar - Cancelamento
+- GET /nfcom/{chave} - Consulta
+- POST /nfcom/status - Status do serviço
+- POST /certificado/upload - Upload de certificado
+- POST /certificado/teste - Teste de certificado
+
+CONFIGURAÇÕES:
+- URL base da API
+- Timeout de requisições
+- Retry automático em caso de falha
+- Logs de comunicação
+
+5.2 INTEGRAÇÃO COM SEFAZ
+-------------------------
+
+SERVIÇOS:
+- NFComRecepcao - Emissão
+- NFComCancelamento - Cancelamento
+- NFComConsulta - Consulta
+- NFComStatusServico - Status
+
+CONFIGURAÇÕES:
+- URLs dos webservices
+- Certificados digitais
+- Ambiente (homologação/produção)
+- Timeout de conexão
+
+5.3 INTEGRAÇÃO COM EMAIL
+-------------------------
+
+FUNCIONALIDADES:
+- Envio de NFCom por email
+- Notificações de status
+- Alertas de certificados
+- Relatórios automáticos
+
+CONFIGURAÇÕES:
+- Servidor SMTP
+- Credenciais de email
+- Templates de email
+- Configuração de anexos
+
+5.4 INTEGRAÇÃO COM SISTEMAS EXTERNOS
+-------------------------------------
+
+POSSÍVEIS INTEGRAÇÕES:
+- ERP (SAP, TOTVS, etc.)
+- Sistemas de pagamento
+- Sistemas de CRM
+- APIs de terceiros
+
+FORMATOS:
+- REST API
+- Webhooks
+- Importação/Exportação CSV/Excel
+- XML
+
+================================================================================
+                        6. RELATÓRIOS
+================================================================================
+
+6.1 RELATÓRIOS OPERACIONAIS
+----------------------------
+
+EMISSÃO POR PERÍODO:
+- Quantidade de NFCom emitidas
+- Valor total emitido
+- Status das emissões
+- Principais destinatários
+- Produtos/serviços mais emitidos
+
+CANCELAMENTOS:
+- Quantidade de cancelamentos
+- Motivos mais comuns
+- Período de cancelamento
+- Análise de tendências
+
+REJEIÇÕES:
+- Motivos de rejeição
+- Frequência de rejeições
+- Análise de padrões
+- Sugestões de correção
+
+6.2 RELATÓRIOS FISCAIS
+-----------------------
+
+IMPOSTOS:
+- ICMS recolhido por período
+- Base de cálculo por UF
+- Alíquotas aplicadas
+- Retenções
+
+DESTINATÁRIOS:
+- Principais destinatários
+- Distribuição por UF
+- Tipo de pessoa (F/J)
+- Valores por destinatário
+
+6.3 RELATÓRIOS GERENCIAIS
+--------------------------
+
+DASHBOARD EXECUTIVO:
+- Resumo mensal
+- Gráficos de tendência
+- Indicadores de performance
+- Alertas importantes
+
+ANÁLISE DE PERFORMANCE:
+- Tempo médio de emissão
+- Taxa de sucesso
+- Tempo de resposta da SEFAZ
+- Disponibilidade do sistema
+
+6.4 RELATÓRIOS TÉCNICOS
+------------------------
+
+CERTIFICADOS:
+- Status dos certificados
+- Vencimentos próximos
+- Histórico de renovações
+- Problemas de conectividade
+
+SISTEMA:
+- Logs de erro
+- Performance do sistema
+- Uso de recursos
+- Backup e restauração
+
+================================================================================
+                        7. SEGURANÇA E AUDITORIA
+================================================================================
+
+7.1 SEGURANÇA DE DADOS
+-----------------------
+
+CRIPTOGRAFIA:
+- Senhas criptografadas (bcrypt)
+- Certificados digitais protegidos
+- Dados sensíveis criptografados
+- Comunicação HTTPS
+
+CONTROLE DE ACESSO:
+- Autenticação JWT
+- Autorização por perfil
+- Sessões com timeout
+- Bloqueio de IPs suspeitos
+
+7.2 AUDITORIA
+--------------
+
+LOGS DE AUDITORIA:
+- Todas as ações dos usuários
+- Alterações em dados críticos
+- Acessos ao sistema
+- Tentativas de login
+
+RELATÓRIOS DE AUDITORIA:
+- Relatório de acessos
+- Alterações por usuário
+- Período de atividade
+- Anomalias detectadas
+
+7.3 BACKUP E RECUPERAÇÃO
+-------------------------
+
+BACKUP AUTOMÁTICO:
+- Backup diário dos dados
+- Backup dos certificados
+- Backup dos XMLs
+- Armazenamento seguro
+
+RECUPERAÇÃO:
+- Procedimentos de restauração
+- Testes de recuperação
+- Documentação de procedimentos
+- Treinamento da equipe
+
+================================================================================
+                        8. CONFIGURAÇÕES TÉCNICAS
+================================================================================
+
+8.1 ARQUITETURA DO SISTEMA
+---------------------------
+
+FRONTEND:
+- Framework: React.js ou Vue.js
+- UI Framework: Material-UI ou Bootstrap
+- Responsivo design
+- PWA (Progressive Web App)
+
+BACKEND:
+- Framework: Laravel (PHP)
+- Banco de dados: MySQL/PostgreSQL
+- Cache: Redis
+- Queue: Laravel Queue
+
+INFRAESTRUTURA:
+- Servidor web: Apache/Nginx
+- SSL/TLS obrigatório
+- Load balancer (se necessário)
+- CDN para assets
+
+8.2 BANCO DE DADOS
+-------------------
+
+TIPO: Relacional (MySQL/PostgreSQL)
+VERSIONAMENTO: Controle de versão
+BACKUP: Automático diário
+OTIMIZAÇÃO: Índices e queries otimizadas
+
+8.3 PERFORMANCE
+----------------
+
+OTIMIZAÇÕES:
+- Cache de consultas
+- Lazy loading
+- Compressão de assets
+- CDN para arquivos estáticos
+
+MONITORAMENTO:
+- Uptime do sistema
+- Tempo de resposta
+- Uso de recursos
+- Alertas automáticos
+
+================================================================================
+                        9. INTERFACE DO USUÁRIO
+================================================================================
+
+9.1 PRINCÍPIOS DE DESIGN
+-------------------------
+
+USABILIDADE:
+- Interface intuitiva
+- Navegação clara
+- Feedback visual
+- Acessibilidade
+
+RESPONSIVIDADE:
+- Funciona em desktop, tablet e mobile
+- Layout adaptativo
+- Touch-friendly
+
+9.2 COMPONENTES PRINCIPAIS
+---------------------------
+
+DASHBOARD:
+- Cards com métricas principais
+- Gráficos interativos
+- Notificações em tempo real
+- Acesso rápido às funcionalidades
+
+FORMULÁRIOS:
+- Validação em tempo real
+- Auto-complete
+- Máscaras de entrada
+- Mensagens de erro claras
+
+LISTAGENS:
+- Paginação
+- Filtros avançados
+- Ordenação
+- Exportação
+
+9.3 TEMAS E PERSONALIZAÇÃO
+---------------------------
+
+TEMAS:
+- Tema claro/escuro
+- Cores personalizáveis
+- Logo da empresa
+- Branding customizado
+
+================================================================================
+                        10. MONITORAMENTO E SUPORTE
+================================================================================
+
+10.1 MONITORAMENTO
+-------------------
+
+SERVIÇOS MONITORADOS:
+- Disponibilidade da API
+- Status dos webservices SEFAZ
+- Performance do sistema
+- Certificados digitais
+- Backup automático
+
+ALERTAS:
+- Sistema indisponível
+- Certificado próximo do vencimento
+- Erro na comunicação com SEFAZ
+- Falha no backup
+- Tentativas de acesso suspeitas
+
+10.2 SUPORTE
+-------------
+
+CANAL DE SUPORTE:
+- Chat online
+- Email de suporte
+- Base de conhecimento
+- FAQ
+- Vídeos tutoriais
+
+NÍVEIS DE SUPORTE:
+- Nível 1: Suporte básico
+- Nível 2: Suporte técnico
+- Nível 3: Desenvolvimento
+
+10.3 DOCUMENTAÇÃO
+------------------
+
+MANUAIS:
+- Manual do usuário
+- Manual técnico
+- Manual de instalação
+- Manual de configuração
+
+TUTORIAIS:
+- Vídeos explicativos
+- Screenshots
+- Exemplos práticos
+- Dicas de uso
+
+================================================================================
+                                CONCLUSÃO
+================================================================================
+
+Este sistema de gestão de NFCom fornece uma solução completa para empresas 
+que precisam emitir e gerenciar Notas Fiscais de Comunicação de forma 
+eficiente e segura.
+
+PRINCIPAIS BENEFÍCIOS:
+- Automatização completa do processo
+- Conformidade com a legislação
+- Redução de erros manuais
+- Relatórios e análises avançadas
+- Segurança e auditoria
+- Interface moderna e intuitiva
+
+PRÓXIMOS PASSOS:
+1. Desenvolvimento do sistema
+2. Testes em ambiente de homologação
+3. Treinamento dos usuários
+4. Migração para produção
+5. Monitoramento contínuo
+
+================================================================================
+                                FIM DO DOCUMENTO
+================================================================================ 

@@ -1,0 +1,298 @@
+{
+	"info": {
+		"_postman_id": "nfcom-api-collection",
+		"name": "NFCom API",
+		"description": "Coleção para testar a API de emissão de NFCom em PHP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usuario\": \"admin\",\n    \"senha\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						},
+						"description": "Endpoint para autenticação e obtenção do token JWT"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "NFCom",
+			"item": [
+				{
+					"name": "Emitir NFCom",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cnpj_emitente\": \"41151201000177\",\n    \"senha\": \"123456\",\n    \"nome\": \"EMPRESA TESTE LTDA\",\n    \"rgie\": \"ISENTO\",\n    \"endereco\": \"Rua das Flores\",\n    \"endereco_numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01234-567\",\n    \"telefone\": \"(11) 1234-5678\",\n    \"cpfcnpj\": \"12345678901\",\n    \"codigobarras\": \"12345678901234567890\",\n    \"itens\": [\n        {\n            \"item\": \"001\",\n            \"descricao\": \"Serviço de Telecomunicações\",\n            \"cclass\": \"1.01\",\n            \"cfop\": \"1.101\",\n            \"quantidade\": 1.00,\n            \"unitario\": 100.00,\n            \"total\": 100.00,\n            \"bc_icms\": 100.00\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/nfcom",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfcom"
+							]
+						},
+						"description": "Endpoint para emissão de NFCom"
+					},
+					"response": []
+				},
+				{
+					"name": "Consultar NFCom",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/nfcom/{{chave_nfcom}}?cnpj=41151201000177&senha=123456&ambiente=homologacao",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfcom",
+								"{{chave_nfcom}}"
+							],
+							"query": [
+								{
+									"key": "cnpj",
+									"value": "41151201000177"
+								},
+								{
+									"key": "senha",
+									"value": "123456"
+								},
+								{
+									"key": "ambiente",
+									"value": "homologacao"
+								}
+							]
+						},
+						"description": "Endpoint para consultar uma NFCom por chave de acesso"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar NFCom",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cnpj\": \"41151201000177\",\n    \"senha\": \"123456\",\n    \"chave\": \"{{chave_nfcom}}\",\n    \"protocolo\": \"{{protocolo_nfcom}}\",\n    \"justificativa\": \"Erro na emissão\",\n    \"ambiente\": \"homologacao\",\n    \"cOrgao\": \"35\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/nfcom/cancelar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfcom",
+								"cancelar"
+							]
+						},
+						"description": "Endpoint para cancelar uma NFCom"
+					},
+					"response": []
+				},
+				{
+					"name": "Status do Serviço",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cnpj\": \"41151201000177\",\n    \"senha\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/nfcom/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfcom",
+								"status"
+							]
+						},
+						"description": "Endpoint para verificar o status do serviço NFCom"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Certificados",
+			"item": [
+				{
+					"name": "Upload de Certificado",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "certificado",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "cnpj",
+									"value": "41151201000177",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/certificado/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"certificado",
+								"upload"
+							]
+						},
+						"description": "Endpoint para fazer upload do certificado digital PFX"
+					},
+					"response": []
+				},
+				{
+					"name": "Testar Certificado",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cnpj\": \"41151201000177\",\n    \"senha\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/certificado/teste",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"certificado",
+								"teste"
+							]
+						},
+						"description": "Endpoint para testar o certificado digital"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "chave_nfcom",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "protocolo_nfcom",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 

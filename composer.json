@@ -1,0 +1,15 @@
+{
+    "require": {
+      "slim/slim": "^4.11",
+      "slim/psr7": "^1.4",
+        "firebase/php-jwt": "^6.11",
+        "robrichards/xmlseclibs": "^3.1",
+        "nfephp-org/sped-common": "^5.1"
+    },
+    "autoload": {
+      "psr-4": {
+        "App\\": "src/",
+        "NFCom\\": "src/NFCom/"
+      }
+    }
+  }
