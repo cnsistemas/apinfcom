@@ -16,14 +16,22 @@ class NFComEmissao
         $this->tools = new NFComTools($cnpj, $senha, $ambiente);
     }
 
-    public function emitir(array $dados): array
+    public function emitir(array $dados, $ambiente)
     {
         try {
             // 1. CNPJ do emitente vindo do JSON
-            $cnpjEmit = preg_replace('/\D/', '', $dados['cnpj_emitente']);
+            $cnpjEmit = preg_replace('/\D/', '', $dados['emitente']['cnpj']);
 
             // 2. Gera o XML da NFCom
-            $xml = NFComXmlBuilder::gerarXmlNFCom($dados, $cnpjEmit);
+            $xml = NFComXmlBuilder::gerarXmlNFCom($dados, $cnpjEmit, $ambiente);
+            // 1. Define o cabeçalho para texto simples
+            // header('Content-Type: text/plain'); 
+
+            // // 2. Exibe o XML dentro de tags <pre> para manter a formatação
+            // echo "<pre>";
+            // echo htmlspecialchars($xml);
+            // echo "</pre>";
+            // die();
 
             // 3. Assina o XML usando o Signer (via NFComTools)
             $xmlAssinado = $this->tools->assinarXML($xml, 'infNFCom');
@@ -37,36 +45,12 @@ class NFComEmissao
 
             // 6. Envia para o webservice
             $resposta = $this->tools->enviarSOAP($xmlCompactado, 'NFComRecepcao');
+            $cleanXml = preg_replace('/(<\/?)(\w+):([^>]*>)/', '$1$3', $resposta);
 
-            // 7. Tenta extrair a resposta da SEFAZ (retorno real ou erro HTML)
-            $retorno = [
-                'status' => 'sucesso',
-                'mensagem' => 'NFCom enviada com sucesso',
-                'resposta' => $resposta,
-                'xml_assinado' => $xmlAssinado
-            ];
+            // Agora carrega o XML limpo
+            $xml = simplexml_load_string($cleanXml, 'SimpleXMLElement', LIBXML_NOCDATA);
+            return json_decode(json_encode($xml, JSON_UNESCAPED_UNICODE), true);
 
-            if (stripos($resposta, '<retNFCom') !== false) {
-                try {
-                    $xmlResp = simplexml_load_string($resposta);
-                    $xmlResp->registerXPathNamespace('ns', 'http://www.portalfiscal.inf.br/NFCom');
-                    $infProt = $xmlResp->xpath('//ns:protNFCom/ns:infProt');
-
-                    if (!empty($infProt[0])) {
-                        $prot = $infProt[0];
-                        $retorno['resposta_parseada'] = [
-                            'chNFCom' => (string) $prot->chNFCom,
-                            'cStat'   => (string) $prot->cStat,
-                            'xMotivo' => (string) $prot->xMotivo,
-                            'nProt'   => (string) $prot->nProt ?? null
-                        ];
-                    }
-                } catch (\Throwable $e) {
-                    $retorno['parse_error'] = $e->getMessage();
-                }
-            }
-
-            return $retorno;
 
         } catch (\Exception $e) {
             return [

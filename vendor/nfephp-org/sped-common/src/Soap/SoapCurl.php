@@ -28,7 +28,7 @@ class SoapCurl extends SoapBase implements SoapInterface
      * Constructor
      * @param Certificate $certificate
      */
-    public function __construct(Certificate $certificate = null)
+    public function __construct(?Certificate $certificate = null)
     {
         parent::__construct($certificate);
     }

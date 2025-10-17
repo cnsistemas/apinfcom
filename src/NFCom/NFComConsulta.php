@@ -13,7 +13,7 @@ class NFComConsulta
         // 1. Montar XML de consulta
         $tpAmb = $ambiente === 'producao' ? '1' : '2';
         $xmlConsulta = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            . "<consSitNFCom xmlns=\"http://www.portalfiscal.inf.br/NFCom\" versao=\"1.00\">"
+            . "<consSitNFCom xmlns=\"http://www.portalfiscal.inf.br/nfcom\" versao=\"1.00\">"
             . "<tpAmb>{$tpAmb}</tpAmb>"
             . "<xServ>CONSULTAR</xServ>"
             . "<chNFCom>{$chave}</chNFCom>"
@@ -31,14 +31,10 @@ class NFComConsulta
         $xmlCompactado = $tools->compactarXML($xmlAssinado);
         $resposta = $tools->enviarSOAP($xmlCompactado, 'NFComConsulta');
 
-        // 4. Padronizar resposta
-        $respostaPadrao = Standardize::toStd($resposta);
+        $cleanXml = preg_replace('/(<\/?)(\w+):([^>]*>)/', '$1$3', $resposta);
 
-        return [
-            'status' => 'sucesso',
-            'mensagem' => 'Consulta realizada com sucesso',
-            'resposta' => $respostaPadrao,
-            'xml_assinado' => $xmlAssinado
-        ];
+        // Agora carrega o XML limpo
+        $xml = simplexml_load_string($cleanXml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        return json_decode(json_encode($xml, JSON_UNESCAPED_UNICODE), true);
     }
 }

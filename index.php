@@ -6,6 +6,7 @@ use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Dotenv\Dotenv;
 
 use NFCom\NFComEmissao;
 use NFCom\NFComConsulta;
@@ -13,6 +14,8 @@ use NFCom\NFComCancelamento;
 use NFCom\NFComTools;
 
 require __DIR__ . '/vendor/autoload.php';
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 $app = AppFactory::create();
 
@@ -36,11 +39,14 @@ $jwtMiddleware = function (Request $request, $handler) use ($key) {
 };
 
 $app->post('/login', function (Request $request, Response $response) use ($key) {
-    $body = json_decode($request->getBody()->getContents(), true);
-    $usuario = $body['usuario'] ?? '';
-    $senha = $body['senha'] ?? '';
+    $token = $request->getHeaderLine('client_id');
+    $pdo = getConnection();
 
-    if ($usuario === 'admin' && $senha === '123456') {
+    // Verifica se o token existe
+    $stmt = $pdo->prepare("SELECT * FROM clientes WHERE CHAVE = ?");
+    $stmt->execute([$token]);
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($usuario['CHAVE'] == $token) {
         $payload = [
             'sub' => $usuario,
             'iat' => time(),
@@ -64,13 +70,31 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
                 ->write(json_encode(['error' => 'JSON inválido.']));
         }
 
-        try {
+        $token = $request->getHeaderLine('client_id');
+        $ambiente = $request->getHeaderLine('ambiente');
+        $pdo = getConnection();
 
-            $cnpj = $dados['cnpj_emitente'];
-            $senha = $dados['senha'];
-            $emissor = new NFComEmissao($cnpj, $senha);
-            $res = $emissor->emitir($dados);
-            $response->getBody()->write(json_encode($res));
+        // Verifica se o token existe
+        $stmt = $pdo->prepare("SELECT * FROM clientes WHERE CHAVE = ?");
+        $stmt->execute([$token]);
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($usuario['CHAVE'] == $token) {
+            $conn = getConnectionNF($usuario);
+        }else{
+            $response->getBody()->write(json_encode(['error' => 'Credenciais inválidas']));
+            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+            die();
+        }
+        
+        
+        try {
+            $cnpj = getOption($conn, 'invoice_company_cnpj');
+            $senha = getOption($conn, 'settings_sales_cron_nfse_password_certificate');
+            $emissor = new NFComEmissao($cnpj, $senha, $ambiente);
+            $res = $emissor->emitir($dados, $ambiente);
+            $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            return $response->withHeader('Content-Type', 'application/json');
+
         } catch (Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withStatus(400);
@@ -96,7 +120,8 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
             $senha = $dados['senha'];
             $cancelador = new NFComCancelamento($cnpj, $senha);
             $res = $cancelador->cancelar($dados);
-            $response->getBody()->write(json_encode($res));
+            $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            return $response->withHeader('Content-Type', 'application/json');
         } catch (Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withStatus(400);
@@ -118,7 +143,8 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
             }
             $consultor = new NFComConsulta($cnpj, $senha);
             $res = $consultor->consultar($chave, $cnpj, $senha, $ambiente);
-            $response->getBody()->write(json_encode($res));
+            $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            return $response->withHeader('Content-Type', 'application/json');
         } catch (Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withStatus(400);
@@ -241,5 +267,40 @@ $app->post('/certificado/teste', function (Request $request, Response $response)
 
     return $response->withHeader('Content-Type', 'application/json');
 })->add($jwtMiddleware);
+
+function getConnection() {
+    $driver = $_ENV['DB_DRIVER'];
+    $host = $_ENV['DB_HOST'];
+    $port = $_ENV['DB_PORT'];
+    $db   = $_ENV['DB_DATABASE'];
+    $user = $_ENV['DB_USERNAME'];
+    $pass = $_ENV['DB_PASSWORD'];
+
+    $dsn = "$driver:host=$host;port=$port;dbname=$db;charset=utf8";
+    return new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+}
+
+function getConnectionNF($conn){
+    $driver = $_ENV['DB_DRIVER'];
+    $host = $conn['SERVIDOR'];
+    $port = $_ENV['DB_PORT'];
+    $db   = $conn['BANCO'];;
+    $user = $conn['USUARIO'];;
+    $pass = $conn['SENHA'];
+
+    $dsn = "$driver:host=$host;port=$port;dbname=$db;charset=utf8";
+    return new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+}
+
+function getOption($conn, $name){
+    $stmt = $conn->prepare("SELECT name, value FROM tbloptions WHERE name = ?");
+    $stmt->execute([$name]);
+    $resp = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $resp['value'];
+}
 
 $app->run();

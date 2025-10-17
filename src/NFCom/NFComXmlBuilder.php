@@ -118,12 +118,12 @@ class NFComXmlBuilder
     }
 
 
-    public static function gerarXmlNFCom($dados, $cnpjEmit)
+    public static function gerarXmlNFCom($dados, $cnpjEmit, $ambiente)
     {
         // Geração correta do cUF, cMunFG, dhEmi etc.
-        $cUF = self::getCodigoUF($dados['uf']);
-        $cMunFG = self::getCodigoMunicipio($dados['cidade'], $dados['uf']);
-        $tpAmb = 2;
+        $cUF = self::getCodigoUF($dados['emitente']['uf']);
+        $cMunFG = $dados['emitente']['codMun'];
+        $tpAmb = ($ambiente == "homologacao") ? 2 : 1;
         $mod = '62';
         $serie = 1;
         $nNF = self::gerarNNF();
@@ -134,6 +134,7 @@ class NFComXmlBuilder
         $verProc = '1.0';
         $procEmi = 0;
         $dhEmi = date('Y-m-d\TH:i:sP');
+        $prepago = $dados['pre-pago'];
 
         $cNF7 = self::gerarCNF2();
 
@@ -157,40 +158,48 @@ class NFComXmlBuilder
         $xml .= "<cUF>$cUF</cUF><tpAmb>$tpAmb</tpAmb><mod>$mod</mod><serie>$serie</serie><nNF>$nNF</nNF>";
         $xml .= "<cNF>{$dados['cNF']}</cNF><cDV>$cDV</cDV><dhEmi>$dhEmi</dhEmi><tpEmis>$tpEmis</tpEmis>";
         $xml .= "<nSiteAutoriz>$nSiteAutoriz</nSiteAutoriz><cMunFG>$cMunFG</cMunFG><finNFCom>$finNFCom</finNFCom>";
-        $xml .= "<tpFat>$tpFat</tpFat><verProc>$verProc</verProc></ide>";
+        $xml .= "<tpFat>$tpFat</tpFat><verProc>$verProc</verProc>";
+        if($prepago != 0){
+            $xml .= "<indPrePago>1</indPrePago	>";
+        }
+        $xml .= "</ide>";
 
         // emitente
-        $xml .= '<emit><CNPJ>' . $cnpjEmit . '</CNPJ>';
-        $xml .= '<IE>' . (isset($dados['rgie']) ? htmlspecialchars($dados['rgie']) : 'ISENTO') . '</IE>';
-        $xml .= '<CRT>3</CRT><xNome>' . htmlspecialchars($dados['nome']) . '</xNome>';
+        $xml .= '<emit><CNPJ>' . $dados['emitente']['cnpj'] . '</CNPJ>';
+        $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? htmlspecialchars($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
+        $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
-        $xml .= '<xLgr>' . htmlspecialchars($dados['endereco']) . '</xLgr>';
-        $xml .= '<nro>' . htmlspecialchars($dados['endereco_numero']) . '</nro>';
-        $xml .= '<xBairro>' . htmlspecialchars($dados['bairro']) . '</xBairro>';
+        $xml .= '<xLgr>' . htmlspecialchars($dados['emitente']['endereco']) . '</xLgr>';
+        $xml .= '<nro>' . htmlspecialchars($dados['emitente']['numero']) . '</nro>';
+        $xml .= '<xBairro>' . htmlspecialchars($dados['emitente']['bairro']) . '</xBairro>';
         $xml .= '<cMun>' . $cMunFG . '</cMun>';
-        $xml .= '<xMun>' . htmlspecialchars($dados['cidade']) . '</xMun>';
-        $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['cep']) . '</CEP>';
-        $xml .= '<UF>' . htmlspecialchars($dados['uf']) . '</UF>';
-        $xml .= '<fone>' . htmlspecialchars($dados['telefone']) . '</fone>';
+        $xml .= '<xMun>' . htmlspecialchars($dados['emitente']['cidade']) . '</xMun>';
+        $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['emitente']['cep']) . '</CEP>';
+        $xml .= '<UF>' . htmlspecialchars($dados['emitente']['uf']) . '</UF>';
+        $xml .= '<fone>' . htmlspecialchars($dados['emitente']['telefone']) . '</fone>';
         $xml .= '</enderEmit></emit>';
 
         // destinatário
-        $xml .= '<dest><xNome>' . htmlspecialchars($dados['nome']) . '</xNome>';
-        $cpfcnpj = preg_replace('/\D/', '', $dados['cpfcnpj']);
+        $xml .= '<dest><xNome>' . htmlspecialchars($dados['destinatario']['nome']) . '</xNome>';
+        $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
         $xml .= strlen($cpfcnpj) == 11 ? '<CPF>' . $cpfcnpj . '</CPF>' : '<CNPJ>' . $cpfcnpj . '</CNPJ>';
-        $xml .= '<indIEDest>9</indIEDest><IE>' . (isset($dados['rgie']) ? htmlspecialchars($dados['rgie']) : 'ISENTO') . '</IE>';
+        $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest><IE>' . (isset($dados['destinatario']['ie']) ? htmlspecialchars($dados['destinatario']['rgie']) : 'ISENTO') . '</IE>';
         $xml .= '<enderDest>';
-        $xml .= '<xLgr>' . htmlspecialchars($dados['endereco']) . '</xLgr>';
-        $xml .= '<nro>' . htmlspecialchars($dados['endereco_numero']) . '</nro>';
-        $xml .= '<xBairro>' . htmlspecialchars($dados['bairro']) . '</xBairro>';
-        $xml .= '<cMun>' . $cMunFG . '</cMun>';
-        $xml .= '<xMun>' . htmlspecialchars($dados['cidade']) . '</xMun>';
-        $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['cep']) . '</CEP>';
-        $xml .= '<UF>' . htmlspecialchars($dados['uf']) . '</UF>';
-        $xml .= '<fone>' . htmlspecialchars($dados['telefone']) . '</fone>';
+        $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
+        $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
+        $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
+        $xml .= '<cMun>' . $dados['destinatario']['codMun'] . '</cMun>';
+        $xml .= '<xMun>' . htmlspecialchars($dados['destinatario']['cidade']) . '</xMun>';
+        $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['destinatario']['cep']) . '</CEP>';
+        $xml .= '<UF>' . htmlspecialchars($dados['destinatario']['uf']) . '</UF>';
+        $xml .= '<fone>' . htmlspecialchars($dados['destinatario']['telefone']) . '</fone>';
         $xml .= '</enderDest></dest>';
 
-        $xml .= '<assinante><iCodAssinante>1</iCodAssinante><tpAssinante>3</tpAssinante><tpServUtil>1</tpServUtil><nContrato>123</nContrato><dContratoIni>2024-01-01</dContratoIni></assinante>';
+        $xml .= '<assinante><iCodAssinante>'. htmlspecialchars($dados['assinante']['CodAssinante']) .'</iCodAssinante><tpAssinante>'. htmlspecialchars($dados['assinante']['tpAssinante']) .'</tpAssinante><tpServUtil>'. htmlspecialchars($dados['assinante']['tpServUtil']) .'</tpServUtil><nContrato>'. htmlspecialchars($dados['assinante']['Contrato']) .'</nContrato><dContratoIni>'. htmlspecialchars($dados['assinante']['DtInicio']) .'</dContratoIni>';
+        // if($dados['assinante']['tpServUtil'] == 1){
+        //     $xml .= '<NroTermPrinc>'. htmlspecialchars($dados['assinante']['CodAssinante']) .'</NroTermPrinc><cUFPrinc>'. htmlspecialchars($dados['assinante']['cUFPrinc']) .'</cUFPrinc>';
+        // }
+        $xml .= '</assinante>';
 
         $vProd = 0; $vBC = 0; $vICMS = 0;
         foreach ($dados['itens'] as $item) {
@@ -202,34 +211,37 @@ class NFComXmlBuilder
             $xml .= '<qFaturada>' . number_format($item['quantidade'], 2, '.', '') . '</qFaturada>';
             $xml .= '<vItem>' . number_format($item['unitario'], 2, '.', '') . '</vItem>';
             $xml .= '<vProd>' . number_format($item['total'], 2, '.', '') . '</vProd>';
-            $xml .= '</prod><imposto><ICMS00><CST>00</CST><vBC>' . number_format($item['bc_icms'], 2, '.', '') . '</vBC>';
-            $xml .= '<pICMS>18.00</pICMS><vICMS>' . number_format($item['bc_icms'] * 0.18, 2, '.', '') . '</vICMS>';
-            $xml .= '</ICMS00></imposto></det>';
-            $vProd += $item['total'];
-            $vBC += $item['bc_icms'];
-            $vICMS += $item['bc_icms'] * 0.18;
+            $xml .= '</prod>';
+            $xml .= '<imposto><ICMS00><CST>' . $item['cst'] . '</CST><vBC>' . number_format($item['bc_icms'], 2, '.', '') . '</vBC>';
+            $xml .= '<pICMS>' . number_format($item['aliq_icms'], 2, '.', '') . '</pICMS><vICMS>' . number_format($item['val_icms'], 2, '.', '') . '</vICMS>';
+            $xml .= '</ICMS00></imposto>';
+            $xml .= '</det>';
         }
 
-        $xml .= '<total><vProd>' . number_format($vProd, 2, '.', '') . '</vProd><ICMSTot>';
-        $xml .= '<vBC>' . number_format($vBC, 2, '.', '') . '</vBC><vICMS>' . number_format($vICMS, 2, '.', '') . '</vICMS><vICMSDeson>0.00</vICMSDeson><vFCP>0.00</vFCP></ICMSTot>';
-        $xml .= '<vCOFINS>0.00</vCOFINS><vPIS>0.00</vPIS><vFUNTTEL>0.00</vFUNTTEL><vFUST>0.00</vFUST>';
-        $xml .= '<vRetTribTot><vRetPIS>0.00</vRetPIS><vRetCofins>0.00</vRetCofins><vRetCSLL>0.00</vRetCSLL><vIRRF>0.00</vIRRF></vRetTribTot>';
-        $xml .= '<vDesc>0.00</vDesc><vOutro>0.00</vOutro><vNF>0.00</vNF></total>';
+        $xml .= '<total><vProd>' . number_format($dados['impostos']['total_prod'], 2, '.', '') . '</vProd><ICMSTot>';
+        $xml .= '<vBC>' . number_format($dados['impostos']['bc_icms_total'], 2, '.', '') . '</vBC><vICMS>' . number_format($dados['impostos']['val_icms_total'], 2, '.', '') . '</vICMS><vICMSDeson>' . number_format($dados['impostos']['icms_des'], 2, '.', '') . '</vICMSDeson><vFCP>' . number_format($dados['impostos']['fcp'], 2, '.', '') . '</vFCP></ICMSTot>';
+        $xml .= '<vCOFINS>' . number_format($dados['impostos']['cofins'], 2, '.', '') . '</vCOFINS><vPIS>' . number_format($dados['impostos']['pis'], 2, '.', '') . '</vPIS><vFUNTTEL>' . number_format($dados['impostos']['funttel'], 2, '.', '') . '</vFUNTTEL><vFUST>' . number_format($dados['impostos']['fust'], 2, '.', '') . '</vFUST>';
+        $xml .= '<vRetTribTot><vRetPIS>' . number_format($dados['impostos']['retPis'], 2, '.', '') . '</vRetPIS><vRetCofins>' . number_format($dados['impostos']['retCofins'], 2, '.', '') . '</vRetCofins><vRetCSLL>' . number_format($dados['impostos']['relCSLL'], 2, '.', '') . '</vRetCSLL><vIRRF>' . number_format($dados['impostos']['retIRRF'], 2, '.', '') . '</vIRRF></vRetTribTot>';
+        $xml .= '<vDesc>' . number_format($dados['impostos']['desconto'], 2, '.', '') . '</vDesc><vOutro>' . number_format($dados['impostos']['outros'], 2, '.', '') . '</vOutro><vNF>' . number_format($dados['impostos']['total_nf'], 2, '.', '') . '</vNF></total>';
 
-        $xml .= '<gFat><CompetFat>202401</CompetFat><dVencFat>2024-01-31</dVencFat>';
-        $xml .= '<codBarras>' . htmlspecialchars($dados['codigobarras']) . '</codBarras><codDebAuto>123456</codDebAuto></gFat>';
+        $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
+        $xml .= '<codBarras>' .$dados['fatura']['codBarras'] . '</codBarras>';
+
+        if(isset($dados['fatura']['codDebAuto']) && $dados['fatura']['codDebAuto'] != 0){
+            $xml .= '<codDebAuto>'.$dados['fatura']['codDebAuto'].'</codDebAuto>';
+        }
+        $xml .= '</gFat>';
 
         $xml .= '<infAdic><infCpl>' . htmlspecialchars($dados['mensagem']) . '</infCpl></infAdic>';
-        $xml .= '<gRespTec><CNPJ>00000000000191</CNPJ><xContato>Suporte</xContato><email>suporte@empresa.com.br</email><fone>11999999999</fone></gRespTec>';
+        $xml .= '<gRespTec><CNPJ>41151201000177</CNPJ><xContato>Suporte</xContato><email>benito@thinkpro.com.br</email><fone>12997877084</fone></gRespTec>';
 
         $xml .= '</infNFCom>'; // FECHA infNFCom — assinatura será fora
 
         $chaveNumerica = substr($chaveAcesso, 5); // remove "NFCom"
-        $tpAmb = 2;
 
 
         // infNFComSupl será depois da assinatura
-        $xml .= '<infNFComSupl><qrCodNFCom>https://nfcom.seufisco.gov.br/consulta?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+        $xml .= '<infNFComSupl><qrCodNFCom>https://dfe-portal.svrs.rs.gov.br/NFCom/QRCode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
 
         $xml .= '</NFCom>';
         return $xml;

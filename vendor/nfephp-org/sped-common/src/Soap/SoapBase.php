@@ -152,7 +152,7 @@ abstract class SoapBase implements SoapInterface
      * @param Certificate|null $certificate
      */
     public function __construct(
-        Certificate $certificate = null
+        ?Certificate $certificate = null
     ) {
         $this->loadCertificate($certificate);
     }
@@ -163,7 +163,7 @@ abstract class SoapBase implements SoapInterface
      * @return void
      * @throws Certificate\Exception\Expired
      */
-    private function isCertificateExpired(Certificate $certificate = null)
+    private function isCertificateExpired(?Certificate $certificate = null)
     {
         if (!$this->disableCertValidation) {
             if (null !== $certificate && $certificate->isExpired()) {
@@ -338,7 +338,7 @@ abstract class SoapBase implements SoapInterface
      * @param Certificate $certificate
      * @return void
      */
-    public function loadCertificate(Certificate $certificate = null)
+    public function loadCertificate(?Certificate $certificate = null)
     {
         $this->isCertificateExpired($certificate);
         if (null !== $certificate) {

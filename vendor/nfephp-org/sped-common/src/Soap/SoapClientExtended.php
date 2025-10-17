@@ -13,7 +13,7 @@ class SoapClientExtended extends SoapClient
      */
     public function __construct($wsdl, $options)
     {
-        parent::SoapClient($wsdl, $options);
+        parent::__construct($wsdl, $options);
     }
 
     /**
@@ -21,11 +21,11 @@ class SoapClientExtended extends SoapClient
      * Changes the original behavior of the class by removing prefixes,
      * suffixes and line breaks that are not supported by some webservices
      * due to their particular settings
-     * @param  string $request
-     * @param  string $location
-     * @param  string $action
-     * @param  int $version
-     * @param  int $oneWay
+     * @param string $request
+     * @param string $location
+     * @param string $action
+     * @param int $version
+     * @param int $oneWay
      * @return string
      */
     #[\ReturnTypeWillChange]

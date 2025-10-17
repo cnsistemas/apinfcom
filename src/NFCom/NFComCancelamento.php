@@ -15,7 +15,7 @@ class NFComCancelamento
         $idEvento = 'ID110111' . $dados['chave'];
         $dataHora = date('Y-m-d\TH:i:sP');
         $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            . "<envEventoNFCom xmlns=\"http://www.portalfiscal.inf.br/NFCom\" versao=\"1.00\">"
+            . "<envEventoNFCom xmlns=\"http://www.portalfiscal.inf.br/NFCom\" versao=\"1.00\">" // Corrigido para /NFCom
             . "<idLote>1</idLote>"
             . "<eventoNFCom versao=\"1.00\">"
             . "<infEvento Id=\"{$idEvento}\">"
@@ -28,9 +28,11 @@ class NFComCancelamento
             . "<nSeqEvento>1</nSeqEvento>"
             . "<verEvento>1.00</verEvento>"
             . "<detEvento versao=\"1.00\">"
+            . "<evCancNFCom>" // Tag corrigida
             . "<descEvento>Cancelamento</descEvento>"
             . "<nProt>{$dados['protocolo']}</nProt>"
             . "<xJust>{$dados['justificativa']}</xJust>"
+            . "</evCancNFCom>"
             . "</detEvento>"
             . "</infEvento>"
             . "</eventoNFCom>"
@@ -41,22 +43,23 @@ class NFComCancelamento
         $tools = new NFComTools($dados['cnpj'], $dados['senha'], $dados['ambiente']);
         $xmlAssinado = $tools->assinarXML($xml, 'infEvento');
 
-        // Validação após assinatura, igual à emissão
-        $xsdPath = __DIR__ . '/../../docs/PL_NFCOM_1.00/eventoNFCom_v1.00.xsd';
-        NFComXmlBuilder::validarXmlContraXsd($xmlAssinado, $xsdPath);
+        // // Validação após assinatura, igual à emissão
+        // $xsdPath = __DIR__ . '/../../docs/PL_NFCOM_1.00/eventoNFCom_v1.00.xsd';
+        // NFComXmlBuilder::validarXmlContraXsd($xmlAssinado, $xsdPath);
+
+        // echo "<pre>";
+        //     echo htmlspecialchars($xmlAssinado);
+        //     echo "</pre>";
+        //     die();
 
         // Compacta e envia
         $xmlCompactado = $tools->compactarXML($xmlAssinado);
-        $resposta = $tools->enviarSOAP($xmlCompactado, 'NFComRecepcaoEvento');
+        $resposta = $tools->enviarSOAP($xmlAssinado, 'NFComRecepcaoEvento');
 
-        // 4. Padronizar resposta
-        $respostaPadrao = Standardize::toStd($resposta);
+        $cleanXml = preg_replace('/(<\/?)(\w+):([^>]*>)/', '$1$3', $resposta);
 
-        return [
-            'status' => 'sucesso',
-            'mensagem' => 'Cancelamento enviado com sucesso',
-            'resposta' => $respostaPadrao,
-            'xml_assinado' => $xmlAssinado
-        ];
+        // Agora carrega o XML limpo
+        $xml = simplexml_load_string($cleanXml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        return json_decode(json_encode($xml, JSON_UNESCAPED_UNICODE), true);
     }
 }

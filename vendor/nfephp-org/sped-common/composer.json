@@ -70,6 +70,8 @@
         "stan": "phpstan analyse src/",
         "stan80": "phpstan analyse src/ -c phpstan80.neon",
         "stan81": "phpstan analyse src/ -c phpstan81.neon",
-        "stan82": "phpstan analyse src/ -c phpstan82.neon"
+        "stan82": "phpstan analyse src/ -c phpstan82.neon",
+        "stan83": "phpstan analyse src/ -c phpstan83.neon",
+        "stan84": "phpstan analyse src/ -c phpstan84.neon"
     }
 }

@@ -33,9 +33,9 @@ class SoapNative extends SoapBase implements SoapInterface
 
     /**
      * Constructor
-     * @param Certificate $certificate
+     * @param Certificate|null $certificate
      */
-    public function __construct(Certificate $certificate = null)
+    public function __construct(?Certificate $certificate = null)
     {
         parent::__construct($certificate);
     }
