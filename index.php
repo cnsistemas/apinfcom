@@ -39,7 +39,7 @@ $jwtMiddleware = function (Request $request, $handler) use ($key) {
 };
 
 $app->post('/login', function (Request $request, Response $response) use ($key) {
-    $token = $request->getHeaderLine('client_id');
+    $token = $request->getHeaderLine('X-Client-Id');
     $pdo = getConnection();
 
     // Verifica se o token existe
