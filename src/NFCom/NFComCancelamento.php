@@ -50,7 +50,7 @@ class NFComCancelamento
 
         // Compacta e envia
         //$xmlCompactado = $tools->compactarXML($xmlAssinado);
-        $resposta = $tools->enviarSOAP($xmlAssinado, 'NFComRecepcaoEvento');
+        $resposta = $tools->enviarSOAP($xmlAssinado, 'NFComRecepcaoEvento', $dados['cOrgao']);
 
         $cleanXml = preg_replace('/(<\/?)(\w+):([^>]*>)/', '$1$3', $resposta);
 

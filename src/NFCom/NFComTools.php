@@ -155,10 +155,10 @@ class NFComTools
 
         $soapAction = "http://www.portalfiscal.inf.br/nfcom/wsdl/{$service}/{$soapActions[$service]}";
 
-        if($uf == "MG"){
+        if($uf == "MG" || $uf == "31"){
             $this->url = "https://nfcom.fazenda.mg.gov.br/nfcom/services" . $service;
         }
-        if($uf == "MT"){
+        if($uf == "MT" || $uf == "51"){
             $this->url = "https://nfcom.fazenda.mt.gov.br/nfcom/services" . $service;
         }
 
