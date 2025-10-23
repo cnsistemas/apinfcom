@@ -14,9 +14,9 @@ class NFComConsulta
         $tpAmb = $ambiente === 'producao' ? '1' : '2';
         $xmlConsulta = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             . "<consSitNFCom xmlns=\"http://www.portalfiscal.inf.br/nfcom\" versao=\"1.00\">"
-            . "<tpAmb>{$tpAmb}</tpAmb>"
-            . "<xServ>CONSULTAR</xServ>"
-            . "<chNFCom>{$chave}</chNFCom>"
+                . "<tpAmb>{$tpAmb}</tpAmb>"
+                . "<xServ>CONSULTAR</xServ>"
+                . "<chNFCom>{$chave}</chNFCom>"
             . "</consSitNFCom>";
 
 
@@ -28,8 +28,13 @@ class NFComConsulta
         //$xsdPath = __DIR__ . '/../../docs/PL_NFCOM_1.00/consSitNFCom_v1.00.xsd';
         //NFComXmlBuilder::validarXmlContraXsd($xmlAssinado, $xsdPath);
 
+        // echo "<pre>";
+        //     echo htmlspecialchars($xmlAssinado);
+        //     echo "</pre>";
+        //     die();
+
         $xmlCompactado = $tools->compactarXML($xmlAssinado);
-        $resposta = $tools->enviarSOAP($xmlCompactado, 'NFComConsulta');
+        $resposta = $tools->enviarSOAP($xmlConsulta, 'NFComConsulta');
 
         $cleanXml = preg_replace('/(<\/?)(\w+):([^>]*>)/', '$1$3', $resposta);
 

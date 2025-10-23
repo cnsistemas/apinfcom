@@ -134,7 +134,7 @@ class NFComTools
         return base64_encode($gzData);
     }
 
-    public function enviarSOAP(string $xmlCompactado, string $service): string
+    public function enviarSOAP(string $xmlCompactado, string $service, $uf=""): string
     {
         $urlBase = $this->environment === 'producao'
             ? 'https://nfcom.svrs.rs.gov.br/WS/'
@@ -154,6 +154,13 @@ class NFComTools
         }
 
         $soapAction = "http://www.portalfiscal.inf.br/nfcom/wsdl/{$service}/{$soapActions[$service]}";
+
+        if($uf == "MG"){
+            $this->url = "https://nfcom.fazenda.mg.gov.br/nfcom/services" . $service;
+        }
+        if($uf == "MT"){
+            $this->url = "https://nfcom.fazenda.mt.gov.br/nfcom/services" . $service;
+        }
 
         // Corpo do envelope corrigido (sem tag aninhada)
         $soap = <<<XML
@@ -183,7 +190,8 @@ class NFComTools
             CURLOPT_SSLKEY         => $this->keyPemPath,
             CURLOPT_TIMEOUT        => 60, // Aumente o tempo de timeout aqui (em segundos)
             CURLOPT_CONNECTTIMEOUT => 30, // Aumente o tempo de conexão aqui (em segundos)
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_VERBOSE => true
         ]);
 
         $response = curl_exec($ch);

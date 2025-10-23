@@ -126,7 +126,7 @@ class NFComXmlBuilder
         $tpAmb = ($ambiente == "homologacao") ? 2 : 1;
         $mod = '62';
         $serie = 1;
-        $nNF = self::gerarNNF();
+        $nNF = $dados['numero_nota'];
         $tpEmis = 1;
         $nSiteAutoriz = 0;
         $finNFCom = 0;
@@ -204,25 +204,137 @@ class NFComXmlBuilder
         $vProd = 0; $vBC = 0; $vICMS = 0;
         foreach ($dados['itens'] as $item) {
             $xml .= '<det nItem="' . intval($item['item']) . '"><prod>';
-            $xml .= '<cProd>' . htmlspecialchars($item['item']) . '</cProd>';
-            $xml .= '<xProd>' . htmlspecialchars($item['descricao']) . '</xProd>';
-            $xml .= '<cClass>' . htmlspecialchars($item['cclass']) . '</cClass>';
-            $xml .= '<CFOP>' . htmlspecialchars($item['cfop']) . '</CFOP><uMed>1</uMed>';
-            $xml .= '<qFaturada>' . number_format($item['quantidade'], 2, '.', '') . '</qFaturada>';
-            $xml .= '<vItem>' . number_format($item['unitario'], 2, '.', '') . '</vItem>';
-            $xml .= '<vProd>' . number_format($item['total'], 2, '.', '') . '</vProd>';
-            $xml .= '</prod>';
-            $xml .= '<imposto><ICMS00><CST>' . $item['cst'] . '</CST><vBC>' . number_format($item['bc_icms'], 2, '.', '') . '</vBC>';
-            $xml .= '<pICMS>' . number_format($item['aliq_icms'], 2, '.', '') . '</pICMS><vICMS>' . number_format($item['val_icms'], 2, '.', '') . '</vICMS>';
-            $xml .= '</ICMS00></imposto>';
+                $xml .= '<cProd>' . htmlspecialchars($item['item']) . '</cProd>';
+                $xml .= '<xProd>' . htmlspecialchars($item['descricao']) . '</xProd>';
+                $xml .= '<cClass>' . htmlspecialchars($item['cclass']) . '</cClass>';
+                $xml .= '<CFOP>' . htmlspecialchars($item['cfop']) . '</CFOP>';
+                $xml .= '<uMed>' . $item['uMed']. '</uMed>';
+                $xml .= '<qFaturada>' . number_format($item['quantidade'], 2, '.', '') . '</qFaturada>';
+                $xml .= '<vItem>' . number_format($item['unitario'], 2, '.', '') . '</vItem>';
+                $xml .= '<vProd>' . number_format($item['total'], 2, '.', '') . '</vProd>';
+                $xml .= '</prod>';
+                if($dados['emitente']['CRT'] == 1){
+                    $xml .= '<imposto><ICMSSN><CST>90</CST><indSN>1</indSN>';
+                    $xml .= '</ICMSSN></imposto>';
+                }else{
+                    $xml .= '<imposto>';
+                    switch ($item['impostos']['tipo_icms']) {
+                        case '00':
+                            $icms = "ICMS00";
+                            break;
+                        case '20':
+                            $icms = "ICMS20";
+                            break;
+                        case '40':
+                            $icms = "ICMS40";
+                            break;
+                        case '51':
+                            $icms = "ICMS51";
+                            break;
+                        case '90':
+                            $icms = "ICMS00";
+                            break;
+                        default:
+                            $icms = "ICMS00";
+                            break;
+                    }
+                        $xml .= '<'.$icms.'>';
+                            $xml .= '<CST>' . $item['impostos']['cst'] . '</CST>';
+                            if($icms == 'ICMS20'){
+                                $xml .= '<pRedBC>' . number_format($item['impostos']['pRedBC'], 2, '.', '') . '</pRedBC>';
+                            }
+                            if($icms != 'ICMS40' && $icms != 'ICMS51'){
+                                $xml .= '<vBC>' . number_format($item['impostos']['bc_icms'], 2, '.', '') . '</vBC>';
+                                $xml .= '<pICMS>' . number_format($item['impostos']['aliq_icms'], 2, '.', '') . '</pICMS>';
+                                $xml .= '<vICMS>' . number_format($item['impostos']['val_icms'], 2, '.', '') . '</vICMS>';
+                            }
+                            if($icms == 'ICMS20' || $icms == 'ICMS40' || $icms == 'ICMS51' || $icms == 'ICMS90'){
+                                $xml .= '<vICMSDeson>' . number_format($item['impostos']['vICMSDeson'], 2, '.', '') . '</vICMSDeson>';
+                                $xml .= '<cBenef>' . number_format($item['impostos']['cBenef'], 2, '.', '') . '</cBenef>';
+                            }
+                            if($icms != 'ICMS40' && $icms != 'ICMS51'){
+                                $xml .= '<pFCP>' . number_format($item['impostos']['pFCP'], 2, '.', '') . '</pFCP>';
+                                $xml .= '<vFCP>' . number_format($item['impostos']['vFCP'], 2, '.', '') . '</vFCP>';
+                            }
+                        $xml .= '</'.$icms.'>';
+                        if($item['impostos']['difal']['vBCUFDest'] > 0){
+                            $xml .= '<cUFDest>' .$item['impostos']['difal']['cUFDest']. '</cUFDest>';
+                            $xml .= '<vBCUFDest>' . number_format($item['impostos']['difal']['vBCUFDest'], 2, '.', '') . '</vBCUFDest>';
+                            $xml .= '<pFCPUFDest>' . number_format($item['impostos']['difal']['pFCPUFDest'], 2, '.', '') . '</pFCPUFDest>';
+                            $xml .= '<pICMSUFDest>' . number_format($item['impostos']['difal']['pICMSUFDest'], 2, '.', '') . '</pICMSUFDest>';
+                            $xml .= '<vFCPUFDest>' . number_format($item['impostos']['difal']['vFCPUFDest'], 2, '.', '') . '</vFCPUFDest>';
+                            $xml .= '<vICMSUFDest>' . number_format($item['impostos']['difal']['vICMSUFDest'], 2, '.', '') . '</vICMSUFDest>';
+                            $xml .= '<vICMSUFEmi>' . number_format($item['impostos']['difal']['vICMSUFEmi'], 2, '.', '') . '</vICMSUFEmi>';
+                            $xml .= '<cBenefUFDest>' . number_format($item['impostos']['difal']['cBenefUFDest'], 2, '.', '') . '</cBenefUFDest>';
+                            $xml .= '<indSemCST>' . number_format($item['impostos']['difal']['indSemCST'], 2, '.', '') . '</indSemCST>';
+                        }
+                        if(isset($item['impostos']['pis']['pis_cst'])){
+                            $xml .= '<PIS>';
+                                $xml .= '<CST>' . $item['impostos']['pis']['pis_cst'] . '</CST>';
+                                $xml .= '<vBC>' . number_format($item['impostos']['pis']['pis_bc'], 2, '.', '') . '</vBC>';
+                                $xml .= '<pPIS>' . number_format($item['impostos']['pis']['pis_aliq'], 2, '.', '') . '</pPIS>';
+                                $xml .= '<vPIS>' . number_format($item['impostos']['pis']['pis_valor'], 2, '.', '') . '</vPIS>';
+                            $xml .= '</PIS>';
+                        }
+                        if(isset($item['impostos']['cofins']['cofins_cst'])){
+                            $xml .= '<COFINS>';
+                                $xml .= '<CST>' . $item['impostos']['cofins']['cofins_cst'] . '</CST>';
+                                $xml .= '<vBC>' . number_format($item['impostos']['cofins']['cofins_bc'], 2, '.', '') . '</vBC>';
+                                $xml .= '<pCOFINS>' . number_format($item['impostos']['cofins']['cofins_aliq'], 2, '.', '') . '</pCOFINS>';
+                                $xml .= '<vCOFINS>' . number_format($item['impostos']['cofins']['cofins_valor'], 2, '.', '') . '</vCOFINS>';
+                            $xml .= '</COFINS>';
+                        }
+                        if(isset($item['impostos']['fust']['fust_bc'])){
+                            $xml .= '<FUST>';
+                                $xml .= '<vBC>' . number_format($item['impostos']['fust']['fust_bc'], 2, '.', '') . '</vBC>';
+                                $xml .= '<pFUST>' . number_format($item['impostos']['fust']['fust_aliq'], 2, '.', '') . '</pFUST>';
+                                $xml .= '<vFUST>' . number_format($item['impostos']['fust']['fust_valor'], 2, '.', '') . '</vFUST>';
+                            $xml .= '</FUST>';
+                        }
+                        if(isset($item['impostos']['funttel']['funttel_bc'])){
+                            $xml .= '<FUNTTEL>';
+                                $xml .= '<vBC>' . number_format($item['impostos']['funttel']['funttel_bc'], 2, '.', '') . '</vBC>';
+                                $xml .= '<pFUNTTEL>' . number_format($item['impostos']['funttel']['funttel_aliq'], 2, '.', '') . '</pFUNTTEL>';
+                                $xml .= '<vFUNTTEL>' . number_format($item['impostos']['funttel']['funttel_valor'], 2, '.', '') . '</vFUNTTEL>';
+                            $xml .= '</FUNTTEL>';
+                        }
+                        if(isset($item['impostos']['retencao']['vRetPIS'])){
+                            $xml .= '<retTrib>';
+                                $xml .= '<vRetPIS>' . number_format($item['impostos']['retencao']['ret_pis'], 2, '.', '') . '</vRetPIS>';
+                                $xml .= '<vRetCofins>' . number_format($item['impostos']['retencao']['ret_cofins'], 2, '.', '') . '</vRetCofins>';
+                                $xml .= '<vRetCSLL>' . number_format($item['impostos']['retencao']['ret_csll'], 2, '.', '') . '</vRetCSLL>';
+                                $xml .= '<vBCIRRF>' . number_format($item['impostos']['retencao']['ret_irrf_bc'], 2, '.', '') . '</vBCIRRF>';
+                                $xml .= '<vIRRF>' . number_format($item['impostos']['retencao']['ret_irrf_val'], 2, '.', '') . '</vIRRF>';
+                            $xml .= '</retTrib>';
+                        }
+                    $xml .= '</imposto>';
+                }
             $xml .= '</det>';
         }
 
-        $xml .= '<total><vProd>' . number_format($dados['impostos']['total_prod'], 2, '.', '') . '</vProd><ICMSTot>';
-        $xml .= '<vBC>' . number_format($dados['impostos']['bc_icms_total'], 2, '.', '') . '</vBC><vICMS>' . number_format($dados['impostos']['val_icms_total'], 2, '.', '') . '</vICMS><vICMSDeson>' . number_format($dados['impostos']['icms_des'], 2, '.', '') . '</vICMSDeson><vFCP>' . number_format($dados['impostos']['fcp'], 2, '.', '') . '</vFCP></ICMSTot>';
-        $xml .= '<vCOFINS>' . number_format($dados['impostos']['cofins'], 2, '.', '') . '</vCOFINS><vPIS>' . number_format($dados['impostos']['pis'], 2, '.', '') . '</vPIS><vFUNTTEL>' . number_format($dados['impostos']['funttel'], 2, '.', '') . '</vFUNTTEL><vFUST>' . number_format($dados['impostos']['fust'], 2, '.', '') . '</vFUST>';
-        $xml .= '<vRetTribTot><vRetPIS>' . number_format($dados['impostos']['retPis'], 2, '.', '') . '</vRetPIS><vRetCofins>' . number_format($dados['impostos']['retCofins'], 2, '.', '') . '</vRetCofins><vRetCSLL>' . number_format($dados['impostos']['relCSLL'], 2, '.', '') . '</vRetCSLL><vIRRF>' . number_format($dados['impostos']['retIRRF'], 2, '.', '') . '</vIRRF></vRetTribTot>';
-        $xml .= '<vDesc>' . number_format($dados['impostos']['desconto'], 2, '.', '') . '</vDesc><vOutro>' . number_format($dados['impostos']['outros'], 2, '.', '') . '</vOutro><vNF>' . number_format($dados['impostos']['total_nf'], 2, '.', '') . '</vNF></total>';
+        $xml .= '<total>';
+            $xml .= '<vProd>' . number_format($dados['totais']['total_prod'], 2, '.', '') . '</vProd>';
+            $xml .= '<ICMSTot>';
+                $xml .= '<vBC>' . number_format($dados['totais']['bc_icms_total'], 2, '.', '') . '</vBC>';
+                $xml .= '<vICMS>' . number_format($dados['totais']['val_icms_total'], 2, '.', '') . '</vICMS>';
+                $xml .= '<vICMSDeson>' . number_format($dados['totais']['icms_des'], 2, '.', '') . '</vICMSDeson>';
+                $xml .= '<vFCP>' . number_format($dados['totais']['fcp'], 2, '.', '') . '</vFCP>';
+            $xml .= '</ICMSTot>';
+            $xml .= '<vCOFINS>' . number_format($dados['totais']['cofins'], 2, '.', '') . '</vCOFINS>';
+            $xml .= '<vPIS>' . number_format($dados['totais']['pis'], 2, '.', '') . '</vPIS>';
+            $xml .= '<vFUNTTEL>' . number_format($dados['totais']['funttel'], 2, '.', '') . '</vFUNTTEL>';
+            $xml .= '<vFUST>' . number_format($dados['totais']['fust'], 2, '.', '') . '</vFUST>';
+            $xml .= '<vRetTribTot>';
+                $xml .= '<vRetPIS>' . number_format($dados['totais']['retPis'], 2, '.', '') . '</vRetPIS>';
+                $xml .= '<vRetCofins>' . number_format($dados['totais']['retCofins'], 2, '.', '') . '</vRetCofins>';
+                $xml .= '<vRetCSLL>' . number_format($dados['totais']['relCSLL'], 2, '.', '') . '</vRetCSLL>';
+                $xml .= '<vIRRF>' . number_format($dados['totais']['retIRRF'], 2, '.', '') . '</vIRRF>';
+            $xml .= '</vRetTribTot>';
+                $xml .= '<vDesc>' . number_format($dados['totais']['desconto'], 2, '.', '') . '</vDesc>';
+                $xml .= '<vOutro>' . number_format($dados['totais']['outros'], 2, '.', '') . '</vOutro>';
+                $xml .= '<vNF>' . number_format($dados['totais']['total_nf'], 2, '.', '') . '</vNF>';
+        $xml .= '</total>';
+       
 
         $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
         $xml .= '<codBarras>' .$dados['fatura']['codBarras'] . '</codBarras>';
@@ -231,6 +343,10 @@ class NFComXmlBuilder
             $xml .= '<codDebAuto>'.$dados['fatura']['codDebAuto'].'</codDebAuto>';
         }
         $xml .= '</gFat>';
+
+        $xml .= '<autXML>';
+            $xml .= '<CNPJ>' . $dados['emitente']['cnpj'] . '</CNPJ>';
+        $xml .= '</autXML>';
 
         $xml .= '<infAdic><infCpl>' . htmlspecialchars($dados['mensagem']) . '</infCpl></infAdic>';
         $xml .= '<gRespTec><CNPJ>41151201000177</CNPJ><xContato>Suporte</xContato><email>benito@thinkpro.com.br</email><fone>12997877084</fone></gRespTec>';
@@ -241,7 +357,22 @@ class NFComXmlBuilder
 
 
         // infNFComSupl será depois da assinatura
-        $xml .= '<infNFComSupl><qrCodNFCom>https://dfe-portal.svrs.rs.gov.br/NFCom/QRCode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+        if($cUF == 31){
+            if($tpAmb == 1){
+                $xml .= '<infNFComSupl><qrCodNFCom>https://portalnfcom.fazenda.mg.gov.br/qrcode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+            }else{
+                $xml .= '<infNFComSupl><qrCodNFCom>https://portalnfcom.fazenda.mg.gov.br/qrcode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+            }
+        }elseif ($cUF == 51) {
+            if($tpAmb == 1){
+                $xml .= '<infNFComSupl><qrCodNFCom>https://www.sefaz.mt.gov.br/nfcom-ext-fe/qrcode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+            }else{
+                $xml .= '<infNFComSupl><qrCodNFCom>https://homologacao.sefaz.mt.gov.br/nfcom-ext-fe/qrcode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+            }
+        }else{
+            $xml .= '<infNFComSupl><qrCodNFCom>https://dfe-portal.svrs.rs.gov.br/NFCom/QRCode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+        }
+        
 
         $xml .= '</NFCom>';
         return $xml;

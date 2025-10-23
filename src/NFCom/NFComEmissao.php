@@ -44,7 +44,7 @@ class NFComEmissao
             $xmlCompactado = $this->tools->compactarXML($xmlAssinado);
 
             // 6. Envia para o webservice
-            $resposta = $this->tools->enviarSOAP($xmlCompactado, 'NFComRecepcao');
+            $resposta = $this->tools->enviarSOAP($xmlCompactado, 'NFComRecepcao', $dados['emitente']['uf']);
             $cleanXml = preg_replace('/(<\/?)(\w+):([^>]*>)/', '$1$3', $resposta);
 
             // Agora carrega o XML limpo
