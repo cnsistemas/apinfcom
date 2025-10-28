@@ -135,7 +135,7 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
             }
 
             $cancelador = new NFComCancelamento($cnpj, $senha);
-            $res = $cancelador->cancelar($dados, $ambiente);
+            $res = $cancelador->cancelar($dados, $senha, $ambiente);
             $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
             return $response->withHeader('Content-Type', 'application/json');
         } catch (Exception $e) {

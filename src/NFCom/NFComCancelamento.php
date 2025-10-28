@@ -8,7 +8,7 @@ use NFCom\Exception\ValidationException;
 
 class NFComCancelamento
 {
-    public function cancelar(array $dados, $ambiente): array
+    public function cancelar(array $dados, $senha, $ambiente): array
     {
         // 1. Montar XML do evento de cancelamento
         $tpAmb = $ambiente === 'producao' ? '1' : '2';
@@ -36,7 +36,7 @@ class NFComCancelamento
 
 
         // 3. Assinar, compactar e enviar
-        $tools = new NFComTools($dados['cnpj'], $dados['senha'], $ambiente);
+        $tools = new NFComTools($dados['cnpj'], $senha, $ambiente);
         $xmlAssinado = $tools->assinarXML($xml, 'infEvento');
 
         // Validação após assinatura, igual à emissão
