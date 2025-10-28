@@ -41,7 +41,7 @@ class NFComTools
         $certs = [];
 
         if (!openssl_pkcs12_read($pfxContent, $certs, $this->certPassword)) {
-            throw new Exception("Não foi possível ler o certificado PFX. Verifique a senha.");
+            throw new Exception("Não foi possível ler o certificado PFX. Verifique a senha.".$this->certPassword);
         }
 
         file_put_contents($this->certPemPath, $certs['cert']);
