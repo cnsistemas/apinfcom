@@ -8,7 +8,7 @@ use NFCom\Exception\ValidationException;
 
 class NFComConsulta
 {
-    public function consultar(string $chave, string $cnpj, string $senha, string $ambiente = 'homologacao'): array
+    public function consultar(string $chave, string $cnpj, string $senha, string $ambiente = 'homologacao')
     {
         // 1. Montar XML de consulta
         $tpAmb = $ambiente === 'producao' ? '1' : '2';
