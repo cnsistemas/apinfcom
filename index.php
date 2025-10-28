@@ -130,6 +130,7 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
         try {
             $cnpj = getOption($conn, 'invoice_company_cnpj');
             $senha = getOption($conn, 'settings_sales_cron_nfse_password_certificate');
+            var_dump($senha);die();
             if (!isset($cnpj, $senha, $dados['chave'], $dados['protocolo'])) {
                 throw new Exception('Campos obrigatórios ausentes para cancelamento.');
             }
