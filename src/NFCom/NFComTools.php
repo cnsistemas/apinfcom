@@ -38,7 +38,6 @@ class NFComTools
     private function loadCert(): void
     {
         $pfxContent = file_get_contents($this->certPath);
-        var_dump($pfxContent);die();
         $certs = [];
 
         if (!openssl_pkcs12_read($pfxContent, $certs, $this->certPassword)) {
