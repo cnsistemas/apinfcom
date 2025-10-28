@@ -93,8 +93,9 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
             $emissor = new NFComEmissao($cnpj, $senha, $ambiente);
             $res = $emissor->emitir($dados, $ambiente);
             $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-            return $response->withHeader('Content-Type', 'application/json');
-            return $response->withStatus(200);
+            return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200); // Define o status HTTP 200 (OK)
 
         } catch (Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
