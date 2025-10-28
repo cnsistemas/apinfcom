@@ -304,7 +304,7 @@ function getConnectionNF($conn){
     $port = $_ENV['DB_PORT'];
     $db   = $conn['BANCO'];;
     $user = $conn['USUARIO'];;
-    $pass = $conn['SENHA'];
+    $pass = decryptData($conn['SENHA']);
 
     $dsn = "$driver:host=$host;port=$port;dbname=$db;charset=utf8";
     return new PDO($dsn, $user, $pass, [
@@ -317,6 +317,17 @@ function getOption($conn, $name){
     $stmt->execute([$name]);
     $resp = $stmt->fetch(PDO::FETCH_ASSOC);
     return $resp['value'];
+}
+
+function decryptData($encryptedData) {
+	$cipherMethod = 'AES-256-CBC';
+	$encryptionKey = $_ENV['DB_KEY'];
+	$encryptedData = base64_decode($encryptedData);
+	$ivLength = openssl_cipher_iv_length($cipherMethod);
+	$iv = substr($encryptedData, 0, $ivLength);
+	$encryptedPayload = substr($encryptedData, $ivLength);
+	$decryptedData = openssl_decrypt($encryptedPayload, $cipherMethod, $encryptionKey, OPENSSL_RAW_DATA, $iv);
+	return $decryptedData;
 }
 
 $app->run();
