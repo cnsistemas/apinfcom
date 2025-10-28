@@ -94,6 +94,7 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
             $res = $emissor->emitir($dados, $ambiente);
             $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
             return $response->withHeader('Content-Type', 'application/json');
+            return $response->withStatus(200);
 
         } catch (Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
