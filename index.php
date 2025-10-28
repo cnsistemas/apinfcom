@@ -22,7 +22,7 @@ $app = AppFactory::create();
 $key = 'SEGREDO_SUPER_SEGURO';
 
 $jwtMiddleware = function (Request $request, $handler) use ($key) {
-    $authHeader = $request->getHeaderLine('Authorization');
+    $authHeader = $request->getHeaderLine('X-Authorization');
     $token = str_replace('Bearer ', '', $authHeader);
 
     try {
