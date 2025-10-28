@@ -27,7 +27,7 @@ class NFComEmissao
             // 1. Define o cabeçalho para texto simples
             // header('Content-Type: text/plain'); 
 
-            // 2. Exibe o XML dentro de tags <pre> para manter a formatação
+            // // 2. Exibe o XML dentro de tags <pre> para manter a formatação
             // echo "<pre>";
             // echo htmlspecialchars($xml);
             // echo "</pre>";
