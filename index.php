@@ -70,8 +70,8 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
                 ->write(json_encode(['error' => 'JSON inválido.']));
         }
 
-        $token = $request->getHeaderLine('client_id');
-        $ambiente = $request->getHeaderLine('ambiente');
+        $token = $request->getHeaderLine('X-Client-Id');
+        $ambiente = $request->getHeaderLine('X-Ambiente');
         $pdo = getConnection();
 
         // Verifica se o token existe
@@ -111,15 +111,31 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
                 ->write(json_encode(['error' => 'JSON inválido.']));
         }
 
+        $token = $request->getHeaderLine('X-Client-Id');
+        $ambiente = $request->getHeaderLine('X-Ambiente');
+        $pdo = getConnection();
+
+        // Verifica se o token existe
+        $stmt = $pdo->prepare("SELECT * FROM clientes WHERE CHAVE = ?");
+        $stmt->execute([$token]);
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($usuario['CHAVE'] == $token) {
+            $conn = getConnectionNF($usuario);
+        }else{
+            $response->getBody()->write(json_encode(['error' => 'Credenciais inválidas']));
+            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+            die();
+        }
+
         try {
-            if (!isset($dados['cnpj'], $dados['senha'], $dados['chave'], $dados['protocolo'])) {
+            $cnpj = getOption($conn, 'invoice_company_cnpj');
+            $senha = getOption($conn, 'settings_sales_cron_nfse_password_certificate');
+            if (!isset($cnpj, $senha, $dados['chave'], $dados['protocolo'])) {
                 throw new Exception('Campos obrigatórios ausentes para cancelamento.');
             }
 
-            $cnpj = $dados['cnpj'];
-            $senha = $dados['senha'];
             $cancelador = new NFComCancelamento($cnpj, $senha);
-            $res = $cancelador->cancelar($dados);
+            $res = $cancelador->cancelar($dados, $ambiente);
             $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
             return $response->withHeader('Content-Type', 'application/json');
         } catch (Exception $e) {
