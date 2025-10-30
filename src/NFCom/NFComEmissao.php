@@ -34,7 +34,7 @@ class NFComEmissao
             // die();
 
             // 3. Assina o XML usando o Signer (via NFComTools)
-            $xmlAssinado = $this->tools->assinarXML($xml, 'infNFCom');
+            $xmlAssinado = $this->tools->assinarXML(trim($xml), 'infNFCom');
 
             // // 2. Exibe o XML dentro de tags <pre> para manter a formatação
             // echo "<pre>";
