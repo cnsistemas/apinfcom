@@ -183,7 +183,7 @@ class NFComXmlBuilder
         $xml .= '<dest><xNome>' . htmlspecialchars($dados['destinatario']['nome']) . '</xNome>';
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
         $xml .= strlen($cpfcnpj) == 11 ? '<CPF>' . $cpfcnpj . '</CPF>' : '<CNPJ>' . $cpfcnpj . '</CNPJ>';
-        $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest><IE>' . (isset($dados['destinatario']['ie']) ? htmlspecialchars($dados['destinatario']['rgie']) : 'ISENTO') . '</IE>';
+        $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest><IE>' . (isset($dados['destinatario']['ie']) ? htmlspecialchars($dados['destinatario']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
         $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
