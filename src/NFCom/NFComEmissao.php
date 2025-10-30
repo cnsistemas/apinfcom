@@ -36,6 +36,12 @@ class NFComEmissao
             // 3. Assina o XML usando o Signer (via NFComTools)
             $xmlAssinado = $this->tools->assinarXML($xml, 'infNFCom');
 
+            // 2. Exibe o XML dentro de tags <pre> para manter a formatação
+            echo "<pre>";
+            echo htmlspecialchars($xmlAssinado);
+            echo "</pre>";
+            die();
+
             // 4. Valida o XML assinado contra o XSD oficial
             //$xsdPath = __DIR__ . '/../../docs/PL_NFCOM_1.00/nfcom_v1.00.xsd';
             //NFComXmlBuilder::validarXmlContraXsd($xmlAssinado, $xsdPath);
