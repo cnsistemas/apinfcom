@@ -217,7 +217,8 @@ class NFComXmlBuilder
                     $xml .= '<imposto><ICMSSN><CST>90</CST><indSN>1</indSN>';
                     $xml .= '</ICMSSN></imposto>';
                 }else{
-                    $xml .= '<imposto>';
+                    if(isset($item['impostos']['tipo_icms'])){
+                        $xml .= '<imposto>';
                     switch ($item['impostos']['tipo_icms']) {
                         case '00':
                             $icms = "ICMS00";
@@ -308,6 +309,7 @@ class NFComXmlBuilder
                             $xml .= '</retTrib>';
                         }
                     $xml .= '</imposto>';
+                    }
                 }
             $xml .= '</det>';
         }
