@@ -364,6 +364,8 @@ class NFComXmlBuilder
         if(isset($dados['fatura']['codDebAuto']) && $dados['fatura']['codDebAuto'] != 0){
             $xml .= '<codDebAuto>'.$dados['fatura']['codDebAuto'].'</codDebAuto>';
         }
+
+        $xml .= '<codBanco>341</codBanco>';
         $xml .= '</gFat>';
 
         $xml .= '<autXML>';
