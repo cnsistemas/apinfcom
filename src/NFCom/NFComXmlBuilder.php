@@ -358,15 +358,13 @@ class NFComXmlBuilder
                 $xml .= '<vNF>' . number_format($dados['totais']['total_nf'], 2, '.', '') . '</vNF>';
         $xml .= '</total>';
        
-        if($dados['fatura']['codBarras']!=""){
-            $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
-            $xml .= '<codBarras>' .$dados['fatura']['codBarras'] . '</codBarras>';
 
-            if(isset($dados['fatura']['codDebAuto']) && $dados['fatura']['codDebAuto'] != 0){
-                $xml .= '<codDebAuto>'.$dados['fatura']['codDebAuto'].'</codDebAuto>';
-            }
-            $xml .= '</gFat>';
+        $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
+
+        if(isset($dados['fatura']['codDebAuto']) && $dados['fatura']['codDebAuto'] != 0){
+            $xml .= '<codDebAuto>'.$dados['fatura']['codDebAuto'].'</codDebAuto>';
         }
+        $xml .= '</gFat>';
 
         $xml .= '<autXML>';
             $xml .= '<CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
