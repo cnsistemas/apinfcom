@@ -66,8 +66,9 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
         $dados = json_decode($request->getBody()->getContents(), true);
 
         if (!is_array($dados)) {
+            // 🚀 CORRIGIDO: Usando ->getBody()->write()
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
-                ->write(json_encode(['error' => 'JSON inválido.']));
+                ->getBody()->write(json_encode(['error' => 'JSON inválido.']));
         }
 
         $token = $request->getHeaderLine('X-Client-Id');
