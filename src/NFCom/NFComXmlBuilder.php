@@ -194,7 +194,7 @@ class NFComXmlBuilder
         $xml .= '<xMun>' . htmlspecialchars($dados['emitente']['cidade']) . '</xMun>';
         $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['emitente']['cep']) . '</CEP>';
         $xml .= '<UF>' . htmlspecialchars($dados['emitente']['uf']) . '</UF>';
-        $xml .= '<fone>' . htmlspecialchars($dados['emitente']['telefone']) . '</fone>';
+        $xml .= '<fone>' . htmlspecialchars(self::limparNumeros($dados['emitente']['telefone'])) . '</fone>';
         $xml .= '</enderEmit></emit>';
 
         // destinatário
@@ -210,7 +210,7 @@ class NFComXmlBuilder
         $xml .= '<xMun>' . htmlspecialchars($dados['destinatario']['cidade']) . '</xMun>';
         $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['destinatario']['cep']) . '</CEP>';
         $xml .= '<UF>' . htmlspecialchars($dados['destinatario']['uf']) . '</UF>';
-        $xml .= '<fone>' . htmlspecialchars($dados['destinatario']['telefone']) . '</fone>';
+        $xml .= '<fone>' . htmlspecialchars(self::limparNumeros($dados['destinatario']['telefone'])) . '</fone>';
         $xml .= '</enderDest></dest>';
 
         $xml .= '<assinante><iCodAssinante>'. htmlspecialchars($dados['assinante']['CodAssinante']) .'</iCodAssinante><tpAssinante>'. htmlspecialchars($dados['assinante']['tpAssinante']) .'</tpAssinante><tpServUtil>'. htmlspecialchars($dados['assinante']['tpServUtil']) .'</tpServUtil><nContrato>'. htmlspecialchars($dados['assinante']['Contrato']) .'</nContrato><dContratoIni>'. htmlspecialchars($dados['assinante']['DtInicio']) .'</dContratoIni>';
