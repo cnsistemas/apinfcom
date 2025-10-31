@@ -359,23 +359,13 @@ class NFComXmlBuilder
         $xml .= '</total>';
        
 
-        // $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
+        $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
 
-        // $xml .= '<dPerUsoIni>2025-10-01</dPerUsoIni>';
-        // $xml .= '<dPerUsoFim>2025-10-31</dPerUsoFim>';
-        // $xml .= '<codDebAuto>000000000</codDebAuto>';
-        // $xml .= '<codBanco>999</codBanco>';
-        // $xml .= '<codAgencia>0000</codAgencia>';
-        // $xml .= '</gFat>';
-
-        $xml .='<gFat>';
-            $xml .= '<CompetFat>202510</CompetFat>';
-            $xml .= '<dVencFat>2025-11-10</dVencFat>';
-            $xml .= '<dPerUsoIni>2025-10-01</dPerUsoIni';
-            $xml .= '<dPerUsoFim>2025-10-31</dPerUsoFim>';
-            $xml .= '<codDebAuto>000000</codDebAuto>';
-            $xml .= '<codBanco>999</codBanco>';
-            $xml .= '<codAgencia>0000</codAgencia>';
+        $xml .= '<dPerUsoIni>2025-10-01</dPerUsoIni>';
+        $xml .= '<dPerUsoFim>2025-10-31</dPerUsoFim>';
+        $xml .= '<codDebAuto>000000000</codDebAuto>';
+        $xml .= '<codBanco>999</codBanco>';
+        $xml .= '<codAgencia>0000</codAgencia>';
         $xml .= '</gFat>';
 
         $xml .= '<autXML>';
