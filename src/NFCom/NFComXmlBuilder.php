@@ -202,8 +202,10 @@ class NFComXmlBuilder
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
         $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
         $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest>';
-        if(isset($dados['destinatario']['ie'])){
-            $xml . '<IE>' . isset($dados['destinatario']['ie']) ? htmlspecialchars($dados['destinatario']['ie']) : 'ISENTO' . '</IE>';
+        if($dados['destinatario']['indIEDest'] == 1){
+            $xml . '<IE>' . $dados['destinatario']['ie'] . '</IE>';
+        }else if($dados['destinatario']['indIEDest'] == 2){
+            $xml . '<IE>ISENTO</IE>';
         }
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
