@@ -80,6 +80,7 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($usuario['CHAVE'] == $token) {
             $conn = getConnectionNF($usuario);
+            var_dump($usuario['CHAVE']);die();
         }else{
             $response->getBody()->write(json_encode(['error' => 'Credenciais inválidas']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
