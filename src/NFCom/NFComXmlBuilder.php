@@ -179,7 +179,7 @@ class NFComXmlBuilder
         $xml .= "</ide>";
 
         // emitente
-        $xml .= '<emit><CNPJ>' . removerSimbolos($dados['emitente']['cnpj']) . '</CNPJ>';
+        $xml .= '<emit><CNPJ>' . self::removerSimbolos($dados['emitente']['cnpj']) . '</CNPJ>';
         $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? htmlspecialchars($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
@@ -196,7 +196,7 @@ class NFComXmlBuilder
         // destinatário
         $xml .= '<dest><xNome>' . htmlspecialchars($dados['destinatario']['nome']) . '</xNome>';
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
-        $xml .= strlen(removerSimbolos($cpfcnpj)) == 11 ? '<CPF>' . removerSimbolos($cpfcnpj) . '</CPF>' : '<CNPJ>' . removerSimbolos($cpfcnpj) . '</CNPJ>';
+        $xml .= strlen(self::removerSimbolos($cpfcnpj)) == 11 ? '<CPF>' . self::removerSimbolos($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::removerSimbolos($cpfcnpj) . '</CNPJ>';
         $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest><IE>' . (isset($dados['destinatario']['ie']) ? htmlspecialchars($dados['destinatario']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
