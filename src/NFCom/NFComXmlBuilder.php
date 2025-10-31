@@ -131,6 +131,10 @@ class NFComXmlBuilder
         return trim($string_limpa);
     }
 
+    public static function limparNumeros($string) {
+        return preg_replace('/[^0-9]/', '', $string);
+    }
+
 
     public static function gerarXmlNFCom($dados, $cnpjEmit, $ambiente)
     {
@@ -179,7 +183,7 @@ class NFComXmlBuilder
         $xml .= "</ide>";
 
         // emitente
-        $xml .= '<emit><CNPJ>' . self::removerSimbolos($dados['emitente']['cnpj']) . '</CNPJ>';
+        $xml .= '<emit><CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
         $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? htmlspecialchars($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
@@ -196,7 +200,7 @@ class NFComXmlBuilder
         // destinatário
         $xml .= '<dest><xNome>' . htmlspecialchars($dados['destinatario']['nome']) . '</xNome>';
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
-        $xml .= strlen(self::removerSimbolos($cpfcnpj)) == 11 ? '<CPF>' . self::removerSimbolos($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::removerSimbolos($cpfcnpj) . '</CNPJ>';
+        $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
         $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest><IE>' . (isset($dados['destinatario']['ie']) ? htmlspecialchars($dados['destinatario']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
