@@ -117,7 +117,7 @@ class NFComXmlBuilder
         return ($resto == 0 || $resto == 1) ? 0 : (11 - $resto);
     }
 
-    private function removerSimbolos($string) {
+    public function removerSimbolos($string) {
         // (A remoção de acentos via iconv é desnecessária para CNPJ, mas mantida por ser genérica)
         $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
         
