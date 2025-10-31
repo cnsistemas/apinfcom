@@ -365,7 +365,7 @@ class NFComXmlBuilder
         $xml .= '</gFat>';
 
         $xml .= '<autXML>';
-            $xml .= '<CNPJ>' . $dados['emitente']['cnpj'] . '</CNPJ>';
+            $xml .= '<CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
         $xml .= '</autXML>';
 
         $xml .= '<infAdic><infCpl>' . htmlspecialchars($dados['mensagem']) . '</infCpl></infAdic>';
