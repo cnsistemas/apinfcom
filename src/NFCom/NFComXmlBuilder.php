@@ -117,6 +117,20 @@ class NFComXmlBuilder
         return ($resto == 0 || $resto == 1) ? 0 : (11 - $resto);
     }
 
+    private function removerSimbolos($string) {
+        // (A remoção de acentos via iconv é desnecessária para CNPJ, mas mantida por ser genérica)
+        $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+        
+        // Remove todos os caracteres que NÃO são letras, números, espaço ou hífen.
+        // Para CNPJ, isso remove '.', '/' e o '-'
+        $string_limpa = preg_replace('/[^a-zA-Z0-9\s-]/', '', $string);
+        
+        // Remove múltiplos espaços e retorna a string
+        $string_limpa = preg_replace('/\s+/', ' ', $string_limpa);
+        
+        return trim($string_limpa);
+    }
+
 
     public static function gerarXmlNFCom($dados, $cnpjEmit, $ambiente)
     {
@@ -165,7 +179,7 @@ class NFComXmlBuilder
         $xml .= "</ide>";
 
         // emitente
-        $xml .= '<emit><CNPJ>' . $dados['emitente']['cnpj'] . '</CNPJ>';
+        $xml .= '<emit><CNPJ>' . removerSimbolos($dados['emitente']['cnpj']) . '</CNPJ>';
         $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? htmlspecialchars($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
@@ -182,7 +196,7 @@ class NFComXmlBuilder
         // destinatário
         $xml .= '<dest><xNome>' . htmlspecialchars($dados['destinatario']['nome']) . '</xNome>';
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
-        $xml .= strlen($cpfcnpj) == 11 ? '<CPF>' . $cpfcnpj . '</CPF>' : '<CNPJ>' . $cpfcnpj . '</CNPJ>';
+        $xml .= strlen(removerSimbolos($cpfcnpj)) == 11 ? '<CPF>' . removerSimbolos($cpfcnpj) . '</CPF>' : '<CNPJ>' . removerSimbolos($cpfcnpj) . '</CNPJ>';
         $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest><IE>' . (isset($dados['destinatario']['ie']) ? htmlspecialchars($dados['destinatario']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
