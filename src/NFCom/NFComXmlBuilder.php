@@ -360,7 +360,9 @@ class NFComXmlBuilder
        
 
         $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
-        $xml .= '<codBarras>' .$dados['fatura']['codBarras'] . '</codBarras>';
+        if($dados['fatura']['codBarras']!=""){
+            $xml .= '<codBarras>' .$dados['fatura']['codBarras'] . '</codBarras>';
+        }
 
         if(isset($dados['fatura']['codDebAuto']) && $dados['fatura']['codDebAuto'] != 0){
             $xml .= '<codDebAuto>'.$dados['fatura']['codDebAuto'].'</codDebAuto>';
