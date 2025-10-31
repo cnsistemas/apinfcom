@@ -162,7 +162,7 @@ class NFComTools
             $this->url = "https://nfcom.fazenda.mt.gov.br/nfcom/services" . $service;
         }
 
-        var_dump($this->url);die();
+        var_dump($xmlCompactado);die();
 
         // Corpo do envelope corrigido (sem tag aninhada)
         $soap = <<<XML
