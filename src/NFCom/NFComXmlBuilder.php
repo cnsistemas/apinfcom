@@ -362,8 +362,6 @@ class NFComXmlBuilder
         $xml .= '<gFat><CompetFat>' . htmlspecialchars($dados['fatura']['CompetFat']) . '</CompetFat><dVencFat>' . htmlspecialchars($dados['fatura']['dVencFat']) . '</dVencFat>';
 
         $xml .= '<codDebAuto>000000</codDebAuto>';
-        $xml .= '<dPerUsoIni>2025-10-01</dPerUsoIni>';
-        $xml .= '<dPerUsoFim>2025-10-31</dPerUsoFim>';
         $xml .= '<codBanco>999</codBanco>';
         $xml .= '<codAgencia>0000</codAgencia>';
         $xml .= '</gFat>';
