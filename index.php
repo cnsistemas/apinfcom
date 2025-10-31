@@ -90,7 +90,6 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
         try {
             $cnpj = getOption($conn, 'invoice_company_cnpj');
             $senha = getOption($conn, 'settings_sales_cron_nfse_password_certificate');
-            var_dump($cnpj);die();
             $emissor = new NFComEmissao($cnpj, $senha, $ambiente);
             $res = $emissor->emitir($dados, $ambiente);
             $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
