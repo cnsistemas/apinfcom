@@ -64,7 +64,6 @@ $app->post('/login', function (Request $request, Response $response) use ($key) 
 $app->group('/nfcom', function (RouteCollectorProxy $group) {
     $group->post('', function (Request $request, Response $response) {
         $dados = json_decode($request->getBody()->getContents(), true);
-        var_dump($dados);die();
         if (!is_array($dados)) {
             // 🚀 CORRIGIDO: Usando ->getBody()->write()
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
