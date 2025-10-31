@@ -366,6 +366,8 @@ class NFComXmlBuilder
         }
         $xml .= '<dPerUsoIni>2025-10-01</dPerUsoIni>';
         $xml .= '<dPerUsoFim>2025-10-31</dPerUsoFim>';
+        $xml .= '<codBanco>001</codBanco>';
+        $xml .= '<codAgencia>09806</codAgencia>';
         $xml .= '</gFat>';
 
         $xml .= '<autXML>';
