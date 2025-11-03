@@ -25,11 +25,6 @@ $jwtMiddleware = function (Request $request, $handler) use ($key) {
     $authHeader = $request->getHeaderLine('X-Authorization');
     $token = str_replace('Bearer ', '', $authHeader);
 
-    if ($request->getUri()->getPath() === '/certificado/upload') {
-        // 🚨 Debug! Veja o que o Middleware está lendo
-        var_dump("Token lido na rota de upload: " . $token); die();
-    }
-
     try {
         if (!$token) {
             throw new Exception('Token ausente');
