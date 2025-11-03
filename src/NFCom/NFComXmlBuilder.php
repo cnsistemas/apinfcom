@@ -378,7 +378,9 @@ class NFComXmlBuilder
             $xml .= '<CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
         $xml .= '</autXML>';
 
-        $xml .= '<infAdic><infCpl>' . htmlspecialchars($dados['mensagem']) . '</infCpl></infAdic>';
+        $mensagem = preg_replace('/\s+/', ' ', $dados['mensagem']);
+
+        $xml .= '<infAdic><infCpl>' . $mensagem . '</infCpl></infAdic>';
         $xml .= '<gRespTec><CNPJ>41151201000177</CNPJ><xContato>Suporte</xContato><email>benito@thinkpro.com.br</email><fone>12997877084</fone></gRespTec>';
 
         $xml .= '</infNFCom>'; // FECHA infNFCom — assinatura será fora
