@@ -228,7 +228,7 @@ class NFComXmlBuilder
         foreach ($dados['itens'] as $item) {
             $xml .= '<det nItem="' . intval($item['item']) . '"><prod>';
                 $xml .= '<cProd>' . htmlspecialchars($item['item']) . '</cProd>';
-                $xml .= '<xProd>' . self::limparNumeros(htmlspecialchars($item['descricao'])) . '</xProd>';
+                $xml .= '<xProd>' . htmlspecialchars($item['descricao']) . '</xProd>';
                 $xml .= '<cClass>' . htmlspecialchars($item['cclass']) . '</cClass>';
                 $xml .= '<CFOP>' . htmlspecialchars($item['cfop']) . '</CFOP>';
                 $xml .= '<uMed>' . $item['uMed']. '</uMed>';
