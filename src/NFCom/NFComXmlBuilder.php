@@ -153,6 +153,7 @@ class NFComXmlBuilder
         $procEmi = 0;
         $dhEmi = date('Y-m-d\TH:i:sP');
         $prepago = $dados['pre-pago'];
+        $cont = 1;
 
         $cNF7 = self::gerarCNF2();
 
@@ -226,7 +227,7 @@ class NFComXmlBuilder
 
         $vProd = 0; $vBC = 0; $vICMS = 0;
         foreach ($dados['itens'] as $item) {
-            $xml .= '<det nItem="' . intval($item['item']) . '"><prod>';
+            $xml .= '<det nItem="' . intval($cont) . '"><prod>';
                 $xml .= '<cProd>' . htmlspecialchars($item['item']) . '</cProd>';
                 $xml .= '<xProd>' . htmlspecialchars($item['descricao']) . '</xProd>';
                 $xml .= '<cClass>' . htmlspecialchars($item['cclass']) . '</cClass>';
@@ -335,6 +336,7 @@ class NFComXmlBuilder
                     }
                 }
             $xml .= '</det>';
+            $cont++;
         }
 
         $xml .= '<total>';
