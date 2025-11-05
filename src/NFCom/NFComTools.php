@@ -156,10 +156,13 @@ class NFComTools
         $soapAction = "http://www.portalfiscal.inf.br/nfcom/wsdl/{$service}/{$soapActions[$service]}";
 
         if($uf == "MG" || $uf == "31"){
-            $this->url = "https://nfcom.fazenda.mg.gov.br/nfcom/services" . $service;
+            $this->url = "https://nfcom.fazenda.mg.gov.br/nfcom/services/" . $service;
+            if($this->environment === 'homologacao'){
+                $this->url = "https://hnfcom.fazenda.mg.gov.br/nfcom/services/" . $service;
+            }
         }
         if($uf == "MT" || $uf == "51"){
-            $this->url = "https://nfcom.fazenda.mt.gov.br/nfcom/services" . $service;
+            $this->url = "https://nfcom.fazenda.mt.gov.br/nfcom/services/" . $service;
         }
 
         // Corpo do envelope corrigido (sem tag aninhada)
