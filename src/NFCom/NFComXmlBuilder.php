@@ -185,7 +185,7 @@ class NFComXmlBuilder
 
         // emitente
         $xml .= '<emit><CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
-        $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? htmlspecialchars($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
+        $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? self::limparNumeros($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['emitente']['endereco']) . '</xLgr>';
@@ -204,7 +204,7 @@ class NFComXmlBuilder
         $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
         $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest>';
         if($dados['destinatario']['indIEDest'] == 1){
-            $xml .= '<IE>' . $dados['destinatario']['ie'] . '</IE>';
+            $xml .= '<IE>' . self::limparNumeros($dados['destinatario']['ie']) . '</IE>';
         }else if($dados['destinatario']['indIEDest'] == 2){
             $xml .= '<IE>ISENTO</IE>';
         }
