@@ -343,14 +343,13 @@ class NFComXmlBuilder
         
         $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
         
-        // Só incluir tag <IE> se indIEDest for 1 (contribuinte) ou 2 (isento)
-        // Quando indIEDest = 9, não informar a tag <IE>
+        // Só incluir tag <IE> se indIEDest for 1 (contribuinte)
+        // Quando indIEDest = 2 (isento) ou 9 (não contribuinte), não informar a tag <IE>
+        // Algumas UFs não aceitam <IE>ISENTO</IE> quando indIEDest = 2
         if ($indIEDest == 1 && !empty($ie) && $ie !== 'ISENTO') {
             $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
-        } else if ($indIEDest == 2) {
-            $xml .= '<IE>ISENTO</IE>';
         }
-        // Se indIEDest = 9, não incluir a tag <IE>
+        // Se indIEDest = 2 (isento) ou 9 (não contribuinte), não incluir a tag <IE>
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
         $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
