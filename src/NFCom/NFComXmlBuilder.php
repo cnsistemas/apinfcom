@@ -319,16 +319,13 @@ class NFComXmlBuilder
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
         $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
         
-        // Lógica de IE: se IE estiver vazia ou não informada, usar indIEDest = 9
+        // Lógica de IE: se IE estiver vazia ou for "ISENTO", usar indIEDest = 9 e não incluir tag <IE>
         $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
         $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
         
-        // Se IE estiver vazia ou for 'ISENTO', definir indIEDest = 9 (Não contribuinte)
+        // Se IE estiver vazia ou for 'ISENTO', sempre definir indIEDest = 9 (Não contribuinte)
         if (empty($ie) || $ie === 'ISENTO') {
-            // Se indIEDest foi informado como 2 (isento), manter, senão usar 9
-            if ($indIEDest !== 2) {
-                $indIEDest = 9;
-            }
+            $indIEDest = 9;
         } else {
             // Se IE está preenchida e indIEDest não foi informado, assumir 1 (contribuinte)
             if ($indIEDest === null) {
@@ -343,13 +340,12 @@ class NFComXmlBuilder
         
         $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
         
-        // Só incluir tag <IE> se indIEDest for 1 (contribuinte)
-        // Quando indIEDest = 2 (isento) ou 9 (não contribuinte), não informar a tag <IE>
-        // Algumas UFs não aceitam <IE>ISENTO</IE> quando indIEDest = 2
+        // Só incluir tag <IE> se indIEDest for 1 (contribuinte) e IE estiver preenchida
+        // Quando IE vazia ou "ISENTO" ou indIEDest = 9, não informar a tag <IE>
         if ($indIEDest == 1 && !empty($ie) && $ie !== 'ISENTO') {
             $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
         }
-        // Se indIEDest = 2 (isento) ou 9 (não contribuinte), não incluir a tag <IE>
+        // Se indIEDest = 9 ou IE vazia/ISENTO, não incluir a tag <IE>
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
         $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
