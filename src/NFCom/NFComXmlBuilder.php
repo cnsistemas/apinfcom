@@ -26,6 +26,28 @@ class NFComXmlBuilder
         return self::$ufIbge[$uf] ?? '35'; // Default SP
     }
 
+    /**
+     * Retorna o código da UF autorizadora baseado na UF do emitente
+     * Para estados que usam SVRS, retorna RS (43)
+     * Para MG e MT, retorna o próprio código da UF
+     */
+    public static function getCodigoUFAutorizadora($uf)
+    {
+        $uf = strtoupper($uf);
+        $codigoUF = self::getCodigoUF($uf);
+        
+        // Estados com ambiente próprio: MG (31) e MT (51)
+        if ($uf == 'MG' || $codigoUF == '31') {
+            return '31'; // Minas Gerais
+        }
+        if ($uf == 'MT' || $codigoUF == '51') {
+            return '51'; // Mato Grosso
+        }
+        
+        // Demais estados usam SVRS (RS = 43)
+        return '43'; // Rio Grande do Sul (SVRS)
+    }
+
     public static function getCodigoMunicipio($cidade, $uf)
     {
         $chave = strtoupper(trim($cidade)) . '|' . strtoupper(trim($uf));
@@ -356,7 +378,10 @@ class NFComXmlBuilder
     public static function gerarXmlNFCom($dados, $cnpjEmit, $ambiente)
     {
         // Geração correta do cUF, cMunFG, dhEmi etc.
-        $cUF = self::getCodigoUF($dados['emitente']['uf']);
+        // cUF deve ser o código da UF autorizadora, não do emitente
+        // Para estados que usam SVRS (como MS), deve ser RS (43)
+        // Para MG e MT, usa o próprio código da UF
+        $cUF = self::getCodigoUFAutorizadora($dados['emitente']['uf']);
         $cMunFG = $dados['emitente']['codMun'];
         $tpAmb = ($ambiente == "homologacao") ? 2 : 1;
         $mod = '62';
