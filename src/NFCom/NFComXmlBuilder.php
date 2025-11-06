@@ -292,7 +292,14 @@ class NFComXmlBuilder
 
         // emitente
         $xml .= '<emit><CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
-        $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? self::limparNumeros($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
+        // Tratamento da IE do emitente: se vazia, não colocar "ISENTO", apenas deixar vazia ou não incluir
+        $ieEmitente = isset($dados['emitente']['ie']) ? trim($dados['emitente']['ie']) : '';
+        if (!empty($ieEmitente) && $ieEmitente !== 'ISENTO') {
+            $xml .= '<IE>' . self::limparNumeros($ieEmitente) . '</IE>';
+        } else if (!empty($ieEmitente) && $ieEmitente === 'ISENTO') {
+            $xml .= '<IE>ISENTO</IE>';
+        }
+        // Se IE estiver vazia, não incluir a tag <IE>
         $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['emitente']['endereco']) . '</xLgr>';
