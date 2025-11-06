@@ -370,12 +370,7 @@ class NFComXmlBuilder
 
         // emitente
         $xml .= '<emit><CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
-        // IE do emitente: se vazia, ISENTO ou ISENTA, não incluir a tag <IE>
-        $ieEmitente = isset($dados['emitente']['ie']) ? trim($dados['emitente']['ie']) : '';
-        if (!empty($ieEmitente) && strtoupper($ieEmitente) !== 'ISENTO' && strtoupper($ieEmitente) !== 'ISENTA') {
-            $xml .= '<IE>' . self::limparNumeros($ieEmitente) . '</IE>';
-        }
-        // Se IE estiver vazia, ISENTO ou ISENTA, não incluir a tag <IE>
+        $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? self::limparNumeros($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
         // Aplica abreviação no logradouro do emitente (limite de 60 caracteres)
@@ -396,34 +391,12 @@ class NFComXmlBuilder
         $xml .= '<dest><xNome>' . htmlspecialchars($nomeDestinatario) . '</xNome>';
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
         $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
-        
-        // Lógica de IE: se IE estiver vazia ou for "ISENTO"/"ISENTA", usar indIEDest = 9 e não incluir tag <IE>
-        $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
-        $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
-        
-        // Se IE estiver vazia ou for 'ISENTO'/'ISENTA', sempre definir indIEDest = 9 (Não contribuinte)
-        if (empty($ie) || strtoupper($ie) === 'ISENTO' || strtoupper($ie) === 'ISENTA') {
-            $indIEDest = 9;
-        } else {
-            // Se IE está preenchida e indIEDest não foi informado, assumir 1 (contribuinte)
-            if ($indIEDest === null) {
-                $indIEDest = 1;
-            }
+        $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest>';
+        if($dados['destinatario']['indIEDest'] == 1){
+            $xml .= '<IE>' . self::limparNumeros($dados['destinatario']['ie']) . '</IE>';
+        }else if($dados['destinatario']['indIEDest'] == 2){
+            $xml .= '<IE>ISENTO</IE>';
         }
-        
-        // Se ainda não foi definido, usar 9 como padrão (não contribuinte)
-        if ($indIEDest === null) {
-            $indIEDest = 9;
-        }
-        
-        $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
-        
-        // Só incluir tag <IE> se indIEDest for 1 (contribuinte) e IE estiver preenchida
-        // Quando IE vazia ou "ISENTO"/"ISENTA" ou indIEDest = 9, não informar a tag <IE>
-        if ($indIEDest == 1 && !empty($ie) && strtoupper($ie) !== 'ISENTO' && strtoupper($ie) !== 'ISENTA') {
-            $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
-        }
-        // Se indIEDest = 9 ou IE vazia/ISENTO/ISENTA, não incluir a tag <IE>
         $xml .= '<enderDest>';
         // Aplica abreviação no logradouro do destinatário (limite de 60 caracteres)
         $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
