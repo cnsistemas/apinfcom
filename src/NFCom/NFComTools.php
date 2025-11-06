@@ -155,15 +155,24 @@ class NFComTools
 
         $soapAction = "http://www.portalfiscal.inf.br/nfcom/wsdl/{$service}/{$soapActions[$service]}";
 
+        // Estados com ambiente próprio
         if($uf == "MG" || $uf == "31"){
-            $this->url = "https://nfcom.fazenda.mg.gov.br/nfcom/services/" . $service;
+            // Minas Gerais
             if($this->environment === 'homologacao'){
                 $this->url = "https://hnfcom.fazenda.mg.gov.br/nfcom/services/" . $service;
+            } else {
+                $this->url = "https://nfcom.fazenda.mg.gov.br/nfcom/services/" . $service;
+            }
+        } else if($uf == "MT" || $uf == "51"){
+            // Mato Grosso
+            if($this->environment === 'homologacao'){
+                $this->url = "https://homologacao.sefaz.mt.gov.br/nfcom/services/" . $service;
+            } else {
+                $this->url = "https://www.sefaz.mt.gov.br/nfcom/services/" . $service;
             }
         }
-        if($uf == "MT" || $uf == "51"){
-            $this->url = "https://nfcom.fazenda.mt.gov.br/nfcom/services/" . $service;
-        }
+        // Demais estados (AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MS, PA, PB, PE, PI, PR, RJ, RN, RO, RR, SC, SE, SP, TO)
+        // usam SVRS (já configurado como padrão acima)
 
         // Corpo do envelope corrigido (sem tag aninhada)
         $soap = <<<XML
