@@ -135,6 +135,113 @@ class NFComXmlBuilder
         return preg_replace('/[^0-9]/', '', $string);
     }
 
+    /**
+     * Abrevia nomes para NFCom (modelo 62) dentro do limite (padrão: 60 chars).
+     * - Aplica abreviações conhecidas (ESCOLA MUNICIPAL -> E.M., PROFESSORA -> PROFª, etc.)
+     * - Remove conectivos (DE/DA/DO/DAS/DOS/E) apenas se ainda exceder o limite
+     * - Abrevia palavras longas (INST., ASSOC., etc.) conforme necessário
+     * - Garante resultado em MAIÚSCULAS e sem espaços duplicados
+     */
+    public static function abrevia_xnome_nfcom(string $nome, int $limite = 60): string
+    {
+        // Garanta suporte a multibyte
+        if (!function_exists('mb_strlen')) {
+            throw new RuntimeException('Extensão mbstring é necessária.');
+        }
+
+        $nome = trim(preg_replace('/\s+/u', ' ', $nome ?? ''));
+        $nome = mb_strtoupper($nome, 'UTF-8');
+
+        // 1) Abreviações específicas e frequentes (ordem importa: mais específicas primeiro)
+        $map = [
+            '/\bSECRETARIA MUNICIPAL\b/u'            => 'SM',
+            '/\bESCOLA MUNICIPAL\b/u'                => 'E.M.',
+            '/\bCENTRO MUNICIPAL\b/u'                => 'C.M.',
+            '/\bCONSELHO ESCOLAR\b/u'                => 'CONS. ESCOLAR',
+            '/\bUNIVERSIDADE\b/u'                    => 'UNIV.',
+            '/\bINSTITUTO\b/u'                       => 'INST.',
+            '/\bFUNDAC[ÃA]O\b/u'                     => 'FUND.',
+            '/\bASSOCIA[ÇC][AÃ]O\b/u'                => 'ASSOC.',
+            '/\bCOL[ÉE]GIO\b/u'                      => 'COL.',
+            '/\bESCOLA\b/u'                          => 'E.',
+            '/\bMUNICIPAL\b/u'                       => 'MUN.',
+            '/\bPROFESSORA\b/u'                      => 'PROFª',
+            '/\bPROFESSOR\b/u'                       => 'PROF.',
+            '/\bDEPARTAMENTO\b/u'                    => 'DEP.',
+            '/\bFACULDADE\b/u'                       => 'FAC.',
+            '/\bFUNDAMENTAL\b/u'                     => 'FUND.',
+            '/\bEDUCA[ÇC][AÃ]O\b/u'                  => 'ED.',
+        ];
+
+        foreach ($map as $pattern => $repl) {
+            $nome = preg_replace($pattern, $repl, $nome);
+        }
+        $nome = trim(preg_replace('/\s+/u', ' ', $nome));
+
+        if (mb_strlen($nome, 'UTF-8') <= $limite) {
+            return $nome;
+        }
+
+        // 2) Remover conectivos / stopwords comuns, se ainda exceder
+        // (somente se necessário; mantém legibilidade)
+        $stopwords = [' DE ', ' DA ', ' DO ', ' DAS ', ' DOS ', ' E ', ' EM ', ' PARA ', ' POR '];
+        foreach ($stopwords as $sw) {
+            // remove a palavra cercada por espaços
+            $nome = preg_replace('/' . preg_quote($sw, '/') . '/u', ' ', ' ' . $nome . ' ');
+            $nome = trim(preg_replace('/\s+/u', ' ', $nome));
+            if (mb_strlen($nome, 'UTF-8') <= $limite) {
+                return $nome;
+            }
+        }
+
+        // 3) Abreviar palavras longas progressivamente (mantém as primeiras letras + ponto)
+        //   - >= 12 chars -> 4 letras + '.'
+        //   - >= 9  chars -> 3 letras + '.'
+        //   - >= 7  chars -> 2 letras + '.'
+        $palavras = preg_split('/\s+/u', $nome, -1, PREG_SPLIT_NO_EMPTY);
+
+        $abrevPalavra = function (string $p): string {
+            $len = mb_strlen($p, 'UTF-8');
+            // Não mexer em siglas/abreviações já curtas ou com ponto
+            if ($len <= 4 || strpos($p, '.') !== false) return $p;
+
+            if ($len >= 12) return mb_substr($p, 0, 4, 'UTF-8') . '.';
+            if ($len >= 9)  return mb_substr($p, 0, 3, 'UTF-8') . '.';
+            if ($len >= 7)  return mb_substr($p, 0, 2, 'UTF-8') . '.';
+            return $p;
+        };
+
+        // Passo 1 de abreviação de longas
+        for ($i = 0; $i < count($palavras); $i++) {
+            $palavras[$i] = $abrevPalavra($palavras[$i]);
+            $temp = trim(preg_replace('/\s+/u', ' ', implode(' ', $palavras)));
+            if (mb_strlen($temp, 'UTF-8') <= $limite) {
+                return $temp;
+            }
+        }
+
+        // 4) Se ainda exceder, abreviar tudo que tiver >=6 chars para 2 letras + '.'
+        for ($i = 0; $i < count($palavras); $i++) {
+            $p = $palavras[$i];
+            if (mb_strlen($p, 'UTF-8') >= 6 && strpos($p, '.') === false) {
+                $palavras[$i] = mb_substr($p, 0, 2, 'UTF-8') . '.';
+            }
+            $temp = trim(preg_replace('/\s+/u', ' ', implode(' ', $palavras)));
+            if (mb_strlen($temp, 'UTF-8') <= $limite) {
+                return $temp;
+            }
+        }
+
+        // 5) Hard-cut final (garante nunca ultrapassar o schema; preserva caractere inteiro)
+        $out = '';
+        for ($i = 0, $n = mb_strlen($nome, 'UTF-8'); $i < $n; $i++) {
+            $ch = mb_substr($nome, $i, 1, 'UTF-8');
+            if (mb_strlen($out . $ch, 'UTF-8') > $limite) break;
+            $out .= $ch;
+        }
+        return rtrim($out);
+    }
+
 
     public static function gerarXmlNFCom($dados, $cnpjEmit, $ambiente)
     {
@@ -199,15 +306,44 @@ class NFComXmlBuilder
         $xml .= '</enderEmit></emit>';
 
         // destinatário
-        $xml .= '<dest><xNome>' . htmlspecialchars($dados['destinatario']['nome']) . '</xNome>';
+        // Aplica abreviação no nome do destinatário (limite de 60 caracteres)
+        $nomeDestinatario = self::abrevia_xnome_nfcom($dados['destinatario']['nome'], 60);
+        $xml .= '<dest><xNome>' . htmlspecialchars($nomeDestinatario) . '</xNome>';
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
         $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
-        $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest>';
-        if($dados['destinatario']['indIEDest'] == 1){
-            $xml .= '<IE>' . self::limparNumeros($dados['destinatario']['ie']) . '</IE>';
-        }else if($dados['destinatario']['indIEDest'] == 2){
+        
+        // Lógica de IE: se IE estiver vazia ou não informada, usar indIEDest = 9
+        $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
+        $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
+        
+        // Se IE estiver vazia ou for 'ISENTO', definir indIEDest = 9 (Não contribuinte)
+        if (empty($ie) || $ie === 'ISENTO') {
+            // Se indIEDest foi informado como 2 (isento), manter, senão usar 9
+            if ($indIEDest !== 2) {
+                $indIEDest = 9;
+            }
+        } else {
+            // Se IE está preenchida e indIEDest não foi informado, assumir 1 (contribuinte)
+            if ($indIEDest === null) {
+                $indIEDest = 1;
+            }
+        }
+        
+        // Se ainda não foi definido, usar 9 como padrão (não contribuinte)
+        if ($indIEDest === null) {
+            $indIEDest = 9;
+        }
+        
+        $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
+        
+        // Só incluir tag <IE> se indIEDest for 1 (contribuinte) ou 2 (isento)
+        // Quando indIEDest = 9, não informar a tag <IE>
+        if ($indIEDest == 1 && !empty($ie) && $ie !== 'ISENTO') {
+            $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
+        } else if ($indIEDest == 2) {
             $xml .= '<IE>ISENTO</IE>';
         }
+        // Se indIEDest = 9, não incluir a tag <IE>
         $xml .= '<enderDest>';
         $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
         $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
