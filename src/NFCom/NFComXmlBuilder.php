@@ -501,11 +501,6 @@ class NFComXmlBuilder
         // }
         $xml .= '</assinante>';
 
-        // Validação: garantir que existam itens antes de gerar o XML
-        if (!isset($dados['itens']) || !is_array($dados['itens']) || empty($dados['itens'])) {
-            throw new \Exception('É obrigatório informar pelo menos um item na NFCom.');
-        }
-
         $vProd = 0; $vBC = 0; $vICMS = 0;
         foreach ($dados['itens'] as $item) {
             $xml .= '<det nItem="' . intval($cont) . '"><prod>';
@@ -618,11 +613,6 @@ class NFComXmlBuilder
                 }
             $xml .= '</det>';
             $cont++;
-        }
-
-        // Verificar se pelo menos um det foi gerado
-        if ($cont == 1) {
-            throw new \Exception('Nenhum item foi processado. Verifique se os itens estão corretamente formatados.');
         }
 
         $xml .= '<total>';
