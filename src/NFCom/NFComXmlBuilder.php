@@ -26,28 +26,6 @@ class NFComXmlBuilder
         return self::$ufIbge[$uf] ?? '35'; // Default SP
     }
 
-    /**
-     * Retorna o código da UF autorizadora baseado na UF do emitente
-     * Para estados que usam SVRS, retorna RS (43)
-     * Para MG e MT, retorna o próprio código da UF
-     */
-    public static function getCodigoUFAutorizadora($uf)
-    {
-        $uf = strtoupper($uf);
-        $codigoUF = self::getCodigoUF($uf);
-        
-        // Estados com ambiente próprio: MG (31) e MT (51)
-        if ($uf == 'MG' || $codigoUF == '31') {
-            return '31'; // Minas Gerais
-        }
-        if ($uf == 'MT' || $codigoUF == '51') {
-            return '51'; // Mato Grosso
-        }
-        
-        // Demais estados usam SVRS (RS = 43)
-        return '43'; // Rio Grande do Sul (SVRS)
-    }
-
     public static function getCodigoMunicipio($cidade, $uf)
     {
         $chave = strtoupper(trim($cidade)) . '|' . strtoupper(trim($uf));
@@ -157,231 +135,11 @@ class NFComXmlBuilder
         return preg_replace('/[^0-9]/', '', $string);
     }
 
-    /**
-     * Abrevia nomes para NFCom (modelo 62) dentro do limite (padrão: 60 chars).
-     * - Aplica abreviações conhecidas (ESCOLA MUNICIPAL -> E.M., PROFESSORA -> PROFª, etc.)
-     * - Remove conectivos (DE/DA/DO/DAS/DOS/E) apenas se ainda exceder o limite
-     * - Abrevia palavras longas (INST., ASSOC., etc.) conforme necessário
-     * - Garante resultado em MAIÚSCULAS e sem espaços duplicados
-     */
-    public static function abrevia_xnome_nfcom(string $nome, int $limite = 60): string
-    {
-        // Garanta suporte a multibyte
-        if (!function_exists('mb_strlen')) {
-            throw new RuntimeException('Extensão mbstring é necessária.');
-        }
-
-        $nome = trim(preg_replace('/\s+/u', ' ', $nome ?? ''));
-        $nome = mb_strtoupper($nome, 'UTF-8');
-
-        // 1) Abreviações específicas e frequentes (ordem importa: mais específicas primeiro)
-        $map = [
-            '/\bSECRETARIA MUNICIPAL\b/u'            => 'SM',
-            '/\bESCOLA MUNICIPAL\b/u'                => 'E.M.',
-            '/\bCENTRO MUNICIPAL\b/u'                => 'C.M.',
-            '/\bCONSELHO ESCOLAR\b/u'                => 'CONS. ESCOLAR',
-            '/\bUNIVERSIDADE\b/u'                    => 'UNIV.',
-            '/\bINSTITUTO\b/u'                       => 'INST.',
-            '/\bFUNDAC[ÃA]O\b/u'                     => 'FUND.',
-            '/\bASSOCIA[ÇC][AÃ]O\b/u'                => 'ASSOC.',
-            '/\bCOL[ÉE]GIO\b/u'                      => 'COL.',
-            '/\bESCOLA\b/u'                          => 'E.',
-            '/\bMUNICIPAL\b/u'                       => 'MUN.',
-            '/\bPROFESSORA\b/u'                      => 'PROFª',
-            '/\bPROFESSOR\b/u'                       => 'PROF.',
-            '/\bDEPARTAMENTO\b/u'                    => 'DEP.',
-            '/\bFACULDADE\b/u'                       => 'FAC.',
-            '/\bFUNDAMENTAL\b/u'                     => 'FUND.',
-            '/\bEDUCA[ÇC][AÃ]O\b/u'                  => 'ED.',
-        ];
-
-        foreach ($map as $pattern => $repl) {
-            $nome = preg_replace($pattern, $repl, $nome);
-        }
-        $nome = trim(preg_replace('/\s+/u', ' ', $nome));
-
-        if (mb_strlen($nome, 'UTF-8') <= $limite) {
-            return $nome;
-        }
-
-        // 2) Remover conectivos / stopwords comuns, se ainda exceder
-        // (somente se necessário; mantém legibilidade)
-        $stopwords = [' DE ', ' DA ', ' DO ', ' DAS ', ' DOS ', ' E ', ' EM ', ' PARA ', ' POR '];
-        foreach ($stopwords as $sw) {
-            // remove a palavra cercada por espaços
-            $nome = preg_replace('/' . preg_quote($sw, '/') . '/u', ' ', ' ' . $nome . ' ');
-            $nome = trim(preg_replace('/\s+/u', ' ', $nome));
-            if (mb_strlen($nome, 'UTF-8') <= $limite) {
-                return $nome;
-            }
-        }
-
-        // 3) Abreviar palavras longas progressivamente (mantém as primeiras letras + ponto)
-        //   - >= 12 chars -> 4 letras + '.'
-        //   - >= 9  chars -> 3 letras + '.'
-        //   - >= 7  chars -> 2 letras + '.'
-        $palavras = preg_split('/\s+/u', $nome, -1, PREG_SPLIT_NO_EMPTY);
-
-        $abrevPalavra = function (string $p): string {
-            $len = mb_strlen($p, 'UTF-8');
-            // Não mexer em siglas/abreviações já curtas ou com ponto
-            if ($len <= 4 || strpos($p, '.') !== false) return $p;
-
-            if ($len >= 12) return mb_substr($p, 0, 4, 'UTF-8') . '.';
-            if ($len >= 9)  return mb_substr($p, 0, 3, 'UTF-8') . '.';
-            if ($len >= 7)  return mb_substr($p, 0, 2, 'UTF-8') . '.';
-            return $p;
-        };
-
-        // Passo 1 de abreviação de longas
-        for ($i = 0; $i < count($palavras); $i++) {
-            $palavras[$i] = $abrevPalavra($palavras[$i]);
-            $temp = trim(preg_replace('/\s+/u', ' ', implode(' ', $palavras)));
-            if (mb_strlen($temp, 'UTF-8') <= $limite) {
-                return $temp;
-            }
-        }
-
-        // 4) Se ainda exceder, abreviar tudo que tiver >=6 chars para 2 letras + '.'
-        for ($i = 0; $i < count($palavras); $i++) {
-            $p = $palavras[$i];
-            if (mb_strlen($p, 'UTF-8') >= 6 && strpos($p, '.') === false) {
-                $palavras[$i] = mb_substr($p, 0, 2, 'UTF-8') . '.';
-            }
-            $temp = trim(preg_replace('/\s+/u', ' ', implode(' ', $palavras)));
-            if (mb_strlen($temp, 'UTF-8') <= $limite) {
-                return $temp;
-            }
-        }
-
-        // 5) Hard-cut final (garante nunca ultrapassar o schema; preserva caractere inteiro)
-        $out = '';
-        for ($i = 0, $n = mb_strlen($nome, 'UTF-8'); $i < $n; $i++) {
-            $ch = mb_substr($nome, $i, 1, 'UTF-8');
-            if (mb_strlen($out . $ch, 'UTF-8') > $limite) break;
-            $out .= $ch;
-        }
-        return rtrim($out);
-    }
-
-    /**
-     * Abrevia logradouros para NFCom (modelo 62) dentro do limite (padrão: 60 chars).
-     * - Aplica abreviações comuns de tipos de logradouro (Avenida → Av., Rua → R., etc.)
-     * - Se ainda exceder, aplica abreviação progressiva
-     * - Garante resultado em MAIÚSCULAS e sem espaços duplicados
-     */
-    public static function abrevia_logradouro_nfcom(string $logradouro, int $limite = 60): string
-    {
-        // Garanta suporte a multibyte
-        if (!function_exists('mb_strlen')) {
-            throw new RuntimeException('Extensão mbstring é necessária.');
-        }
-
-        $logradouro = trim(preg_replace('/\s+/u', ' ', $logradouro ?? ''));
-        $logradouro = mb_strtoupper($logradouro, 'UTF-8');
-
-        // 1) Abreviações específicas de tipos de logradouro (ordem importa: mais específicas primeiro)
-        $map = [
-            '/\bAVENIDA\b/u'                    => 'Av.',
-            '/\bRUA\b/u'                        => 'R.',
-            '/\bESTRADA\b/u'                    => 'Estr.',
-            '/\bESTRADA MUNICIPAL\b/u'          => 'Estr. Mun.',
-            '/\bESTRADA ESTADUAL\b/u'           => 'Estr. Est.',
-            '/\bRODOVIA\b/u'                    => 'Rod.',
-            '/\bALAMEDA\b/u'                    => 'Al.',
-            '/\bTRAVESSA\b/u'                   => 'Tv.',
-            '/\bVIELA\b/u'                      => 'Vl.',
-            '/\bVIADUTO\b/u'                    => 'Vd.',
-            '/\bPRAÇA\b/u'                      => 'Pç.',
-            '/\bLARGO\b/u'                      => 'Lg.',
-            '/\bBECO\b/u'                       => 'Bc.',
-            '/\bPASSAGEM\b/u'                   => 'Ps.',
-            '/\bPARQUE\b/u'                     => 'Pq.',
-            '/\bJARDIM\b/u'                     => 'Jd.',
-            '/\bCONJUNTO\b/u'                   => 'Cj.',
-            '/\bLOTEAMENTO\b/u'                 => 'Lt.',
-            '/\bCHÁCARA\b/u'                    => 'Ch.',
-            '/\bSÍTIO\b/u'                      => 'St.',
-            '/\bFAZENDA\b/u'                    => 'Faz.',
-            '/\bVILA\b/u'                       => 'Vl.',
-            '/\bDISTRITO\b/u'                  => 'Dist.',
-            '/\bMUNICIPAL\b/u'                  => 'Mun.',
-            '/\bESTADUAL\b/u'                   => 'Est.',
-            '/\bFEDERAL\b/u'                    => 'Fed.',
-        ];
-
-        foreach ($map as $pattern => $repl) {
-            $logradouro = preg_replace($pattern, $repl, $logradouro);
-        }
-        $logradouro = trim(preg_replace('/\s+/u', ' ', $logradouro));
-
-        if (mb_strlen($logradouro, 'UTF-8') <= $limite) {
-            return $logradouro;
-        }
-
-        // 2) Remover conectivos / stopwords comuns, se ainda exceder
-        $stopwords = [' DE ', ' DA ', ' DO ', ' DAS ', ' DOS ', ' E ', ' EM ', ' PARA ', ' POR ', ' - '];
-        foreach ($stopwords as $sw) {
-            $logradouro = preg_replace('/' . preg_quote($sw, '/') . '/u', ' ', ' ' . $logradouro . ' ');
-            $logradouro = trim(preg_replace('/\s+/u', ' ', $logradouro));
-            if (mb_strlen($logradouro, 'UTF-8') <= $limite) {
-                return $logradouro;
-            }
-        }
-
-        // 3) Abreviar palavras longas progressivamente (mantém as primeiras letras + ponto)
-        $palavras = preg_split('/\s+/u', $logradouro, -1, PREG_SPLIT_NO_EMPTY);
-
-        $abrevPalavra = function (string $p): string {
-            $len = mb_strlen($p, 'UTF-8');
-            // Não mexer em siglas/abreviações já curtas ou com ponto
-            if ($len <= 4 || strpos($p, '.') !== false) return $p;
-
-            if ($len >= 12) return mb_substr($p, 0, 4, 'UTF-8') . '.';
-            if ($len >= 9)  return mb_substr($p, 0, 3, 'UTF-8') . '.';
-            if ($len >= 7)  return mb_substr($p, 0, 2, 'UTF-8') . '.';
-            return $p;
-        };
-
-        // Passo 1 de abreviação de longas
-        for ($i = 0; $i < count($palavras); $i++) {
-            $palavras[$i] = $abrevPalavra($palavras[$i]);
-            $temp = trim(preg_replace('/\s+/u', ' ', implode(' ', $palavras)));
-            if (mb_strlen($temp, 'UTF-8') <= $limite) {
-                return $temp;
-            }
-        }
-
-        // 4) Se ainda exceder, abreviar tudo que tiver >=6 chars para 2 letras + '.'
-        for ($i = 0; $i < count($palavras); $i++) {
-            $p = $palavras[$i];
-            if (mb_strlen($p, 'UTF-8') >= 6 && strpos($p, '.') === false) {
-                $palavras[$i] = mb_substr($p, 0, 2, 'UTF-8') . '.';
-            }
-            $temp = trim(preg_replace('/\s+/u', ' ', implode(' ', $palavras)));
-            if (mb_strlen($temp, 'UTF-8') <= $limite) {
-                return $temp;
-            }
-        }
-
-        // 5) Hard-cut final (garante nunca ultrapassar o schema; preserva caractere inteiro)
-        $out = '';
-        for ($i = 0, $n = mb_strlen($logradouro, 'UTF-8'); $i < $n; $i++) {
-            $ch = mb_substr($logradouro, $i, 1, 'UTF-8');
-            if (mb_strlen($out . $ch, 'UTF-8') > $limite) break;
-            $out .= $ch;
-        }
-        return rtrim($out);
-    }
-
 
     public static function gerarXmlNFCom($dados, $cnpjEmit, $ambiente)
     {
         // Geração correta do cUF, cMunFG, dhEmi etc.
-        // cUF deve ser o código da UF autorizadora, não do emitente
-        // Para estados que usam SVRS (como MS), deve ser RS (43)
-        // Para MG e MT, usa o próprio código da UF
-        $cUF = self::getCodigoUFAutorizadora($dados['emitente']['uf']);
+        $cUF = self::getCodigoUF($dados['emitente']['uf']);
         $cMunFG = $dados['emitente']['codMun'];
         $tpAmb = ($ambiente == "homologacao") ? 2 : 1;
         $mod = '62';
@@ -427,19 +185,10 @@ class NFComXmlBuilder
 
         // emitente
         $xml .= '<emit><CNPJ>' . self::limparNumeros($dados['emitente']['cnpj']) . '</CNPJ>';
-        // Tratamento da IE do emitente: se vazia, não colocar "ISENTO", apenas deixar vazia ou não incluir
-        $ieEmitente = isset($dados['emitente']['ie']) ? trim($dados['emitente']['ie']) : '';
-        if (!empty($ieEmitente) && $ieEmitente !== 'ISENTO') {
-            $xml .= '<IE>' . self::limparNumeros($ieEmitente) . '</IE>';
-        } else if (!empty($ieEmitente) && $ieEmitente === 'ISENTO') {
-            $xml .= '<IE>ISENTO</IE>';
-        }
-        // Se IE estiver vazia, não incluir a tag <IE>
+        $xml .= '<IE>' . (isset($dados['emitente']['ie']) ? self::limparNumeros($dados['emitente']['ie']) : 'ISENTO') . '</IE>';
         $xml .= '<CRT>'.$dados['emitente']['CRT'].'</CRT><xNome>' . htmlspecialchars($dados['emitente']['nome']) . '</xNome>';
         $xml .= '<enderEmit>';
-        // Aplica abreviação no logradouro do emitente (limite de 60 caracteres)
-        $logradouroEmitente = self::abrevia_logradouro_nfcom($dados['emitente']['endereco'], 60);
-        $xml .= '<xLgr>' . htmlspecialchars($logradouroEmitente) . '</xLgr>';
+        $xml .= '<xLgr>' . htmlspecialchars($dados['emitente']['endereco']) . '</xLgr>';
         $xml .= '<nro>' . htmlspecialchars($dados['emitente']['numero']) . '</nro>';
         $xml .= '<xBairro>' . htmlspecialchars($dados['emitente']['bairro']) . '</xBairro>';
         $xml .= '<cMun>' . $cMunFG . '</cMun>';
@@ -450,43 +199,17 @@ class NFComXmlBuilder
         $xml .= '</enderEmit></emit>';
 
         // destinatário
-        // Aplica abreviação no nome do destinatário (limite de 60 caracteres)
-        $nomeDestinatario = self::abrevia_xnome_nfcom($dados['destinatario']['nome'], 60);
-        $xml .= '<dest><xNome>' . htmlspecialchars($nomeDestinatario) . '</xNome>';
+        $xml .= '<dest><xNome>' . htmlspecialchars($dados['destinatario']['nome']) . '</xNome>';
         $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
         $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
-        
-        // Lógica de IE: se IE estiver vazia ou for "ISENTO", usar indIEDest = 9 e não incluir tag <IE>
-        $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
-        $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
-        
-        // Se IE estiver vazia ou for 'ISENTO', sempre definir indIEDest = 9 (Não contribuinte)
-        if (empty($ie) || $ie === 'ISENTO') {
-            $indIEDest = 9;
-        } else {
-            // Se IE está preenchida e indIEDest não foi informado, assumir 1 (contribuinte)
-            if ($indIEDest === null) {
-                $indIEDest = 1;
-            }
+        $xml .= '<indIEDest>'.$dados['destinatario']['indIEDest'].'</indIEDest>';
+        if($dados['destinatario']['indIEDest'] == 1){
+            $xml .= '<IE>' . self::limparNumeros($dados['destinatario']['ie']) . '</IE>';
+        }else if($dados['destinatario']['indIEDest'] == 2){
+            $xml .= '<IE>ISENTO</IE>';
         }
-        
-        // Se ainda não foi definido, usar 9 como padrão (não contribuinte)
-        if ($indIEDest === null) {
-            $indIEDest = 9;
-        }
-        
-        $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
-        
-        // Só incluir tag <IE> se indIEDest for 1 (contribuinte) e IE estiver preenchida
-        // Quando IE vazia ou "ISENTO" ou indIEDest = 9, não informar a tag <IE>
-        if ($indIEDest == 1 && !empty($ie) && $ie !== 'ISENTO') {
-            $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
-        }
-        // Se indIEDest = 9 ou IE vazia/ISENTO, não incluir a tag <IE>
         $xml .= '<enderDest>';
-        // Aplica abreviação no logradouro do destinatário (limite de 60 caracteres)
-        $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
-        $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
+        $xml .= '<xLgr>' . htmlspecialchars($dados['destinatario']['endereco']) . '</xLgr>';
         $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
         $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
         $xml .= '<cMun>' . $dados['destinatario']['codMun'] . '</cMun>';
