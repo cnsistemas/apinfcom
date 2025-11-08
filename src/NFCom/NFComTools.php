@@ -170,9 +170,16 @@ class NFComTools
             } else {
                 $this->url = "https://www.sefaz.mt.gov.br/nfcom/services/" . $service;
             }
-        }
-        // Demais estados (AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MS, PA, PB, PE, PI, PR, RJ, RN, RO, RR, SC, SE, SP, TO)
-        // usam SVRS (já configurado como padrão acima)
+        } else if($uf == "MS" || $uf == "50"){
+            // Mato Grosso
+            if($this->environment === 'homologacao'){
+                $this->url = "https://hom.nfcom.sefaz.ms.gov.br/ws/" . $service;
+            } else {
+                $this->url = "https://nfcom.sefaz.ms.gov.br/ws/" . $service;
+            }
+
+        } 
+       // usam SVRS (já configurado como padrão acima)
 
         // Corpo do envelope corrigido (sem tag aninhada)
         $soap = <<<XML

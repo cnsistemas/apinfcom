@@ -600,7 +600,7 @@ class NFComXmlBuilder
         $mensagem = preg_replace('/\s+/', ' ', $dados['mensagem']);
 
         $xml .= '<infAdic><infCpl>' . $mensagem . '</infCpl></infAdic>';
-        $xml .= '<gRespTec><CNPJ>41151201000177</CNPJ><xContato>Suporte</xContato><email>benito@thinkpro.com.br</email><fone>12997877084</fone></gRespTec>';
+        $xml .= '<gRespTec><CNPJ>65040693000191</CNPJ><xContato>Suporte</xContato><email>benito@vssistemas.com.br</email><fone>12997877084</fone></gRespTec>';
 
         $xml .= '</infNFCom>'; // FECHA infNFCom — assinatura será fora
 
@@ -620,7 +620,14 @@ class NFComXmlBuilder
             }else{
                 $xml .= '<infNFComSupl><qrCodNFCom>https://homologacao.sefaz.mt.gov.br/nfcom-ext-fe/qrcode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
             }
-        }else{
+        }elseif ($cUF == 50) {
+            if($tpAmb == 1){
+                $xml .= '<infNFComSupl><qrCodNFCom>https://www.dfe.ms.gov.br/nfcom/qrcode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+            }else{
+                $xml .= '<infNFComSupl><qrCodNFCom>https://www.dfe.ms.gov.br/nfcom/qrcode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
+            }
+        }
+	else{
             $xml .= '<infNFComSupl><qrCodNFCom>https://dfe-portal.svrs.rs.gov.br/NFCom/QRCode?chNFCom=' . $chaveNumerica . '&amp;tpAmb=' . $tpAmb . '</qrCodNFCom></infNFComSupl>';
         }
         
