@@ -396,6 +396,7 @@ class NFComXmlBuilder
         $xml .= '<dest><xNome>' . htmlspecialchars($nomeDestinatario) . '</xNome>';
         if($dados['destinatario']['uf'] == "EX"){
             $xml .= '<enderDest>';
+                $xml .= '<idOutros>9999999</idOutros>';
                 $xml .= '<cPais>00655</cPais>';
                 $xml .= '<xPais>ARUBA</xPais>';
                 $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
