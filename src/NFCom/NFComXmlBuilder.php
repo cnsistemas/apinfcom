@@ -395,13 +395,15 @@ class NFComXmlBuilder
         $nomeDestinatario = self::abrevia_xnome_nfcom($dados['destinatario']['nome'], 60);
         $xml .= '<dest><xNome>' . htmlspecialchars($nomeDestinatario) . '</xNome>';
         if($dados['destinatario']['uf'] == "EX"){
-            $xml .= '<endInter>';
+            $xml .= '<enderDest>';
                 $xml .= '<cPais>00655</cPais>';
                 $xml .= '<xPais>ARUBA</xPais>';
                 $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
                 $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
                 $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
-            $xml .= '</endInter></dest>';
+                $xml .= '<cMun>9999999</cMun>';
+                $xml .= '<xMun>EXTERIOR</xMun>';
+            $xml .= '</enderDest></dest>';
         }else{
             $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
             $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
