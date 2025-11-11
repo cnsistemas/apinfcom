@@ -401,7 +401,7 @@ class NFComXmlBuilder
                 $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
                 $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
                 $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
-            $xml .= '</endInter>';
+            $xml .= '</endInter></dest>';
         }else{
             $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
             $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
