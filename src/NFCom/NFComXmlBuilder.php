@@ -394,47 +394,57 @@ class NFComXmlBuilder
         // Aplica abreviação no nome do destinatário (limite de 60 caracteres)
         $nomeDestinatario = self::abrevia_xnome_nfcom($dados['destinatario']['nome'], 60);
         $xml .= '<dest><xNome>' . htmlspecialchars($nomeDestinatario) . '</xNome>';
-        $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
-        $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
-        
-        // Lógica de IE: se IE estiver vazia ou for "ISENTO"/"ISENTA", usar indIEDest = 9 e não incluir tag <IE>
-        $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
-        $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
-        
-        // Se IE estiver vazia ou for 'ISENTO'/'ISENTA', sempre definir indIEDest = 9 (Não contribuinte)
-        if (empty($ie) || strtoupper($ie) === 'ISENTO' || strtoupper($ie) === 'ISENTA') {
-            $indIEDest = 9;
-        } else {
-            // Se IE está preenchida e indIEDest não foi informado, assumir 1 (contribuinte)
-            if ($indIEDest === null) {
-                $indIEDest = 1;
+        if(preg_replace('/\D/', '', $dados['destinatario']['cep']) == 1){
+            $xml .= '<endInter>';
+                $xml .= '<cPais>00655</cPais>';
+                $xml .= '<xPais>ARUBA</xPais>';
+                $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
+                $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
+                $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
+            $xml .= '</endInter>';
+        }else{
+            $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
+            $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
+            
+            // Lógica de IE: se IE estiver vazia ou for "ISENTO"/"ISENTA", usar indIEDest = 9 e não incluir tag <IE>
+            $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
+            $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
+            
+            // Se IE estiver vazia ou for 'ISENTO'/'ISENTA', sempre definir indIEDest = 9 (Não contribuinte)
+            if (empty($ie) || strtoupper($ie) === 'ISENTO' || strtoupper($ie) === 'ISENTA') {
+                $indIEDest = 9;
+            } else {
+                // Se IE está preenchida e indIEDest não foi informado, assumir 1 (contribuinte)
+                if ($indIEDest === null) {
+                    $indIEDest = 1;
+                }
             }
+            
+            // Se ainda não foi definido, usar 9 como padrão (não contribuinte)
+            if ($indIEDest === null) {
+                $indIEDest = 9;
+            }
+            
+            $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
+            
+            // Só incluir tag <IE> se indIEDest for 1 (contribuinte) e IE estiver preenchida
+            // Quando IE vazia ou "ISENTO"/"ISENTA" ou indIEDest = 9, não informar a tag <IE>
+            if ($indIEDest == 1 && !empty($ie) && strtoupper($ie) !== 'ISENTO' && strtoupper($ie) !== 'ISENTA') {
+                $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
+            }
+            // Se indIEDest = 9 ou IE vazia/ISENTO/ISENTA, não incluir a tag <IE>
+            $xml .= '<enderDest>';
+            // Aplica abreviação no logradouro do destinatário (limite de 60 caracteres)
+            $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
+            $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
+            $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
+            $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
+            $xml .= '<cMun>' . $dados['destinatario']['codMun'] . '</cMun>';
+            $xml .= '<xMun>' . htmlspecialchars($dados['destinatario']['cidade']) . '</xMun>';
+            $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['destinatario']['cep']) . '</CEP>';
+            $xml .= '<UF>' . htmlspecialchars($dados['destinatario']['uf']) . '</UF>';
+            $xml .= '</enderDest></dest>';
         }
-        
-        // Se ainda não foi definido, usar 9 como padrão (não contribuinte)
-        if ($indIEDest === null) {
-            $indIEDest = 9;
-        }
-        
-        $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
-        
-        // Só incluir tag <IE> se indIEDest for 1 (contribuinte) e IE estiver preenchida
-        // Quando IE vazia ou "ISENTO"/"ISENTA" ou indIEDest = 9, não informar a tag <IE>
-        if ($indIEDest == 1 && !empty($ie) && strtoupper($ie) !== 'ISENTO' && strtoupper($ie) !== 'ISENTA') {
-            $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
-        }
-        // Se indIEDest = 9 ou IE vazia/ISENTO/ISENTA, não incluir a tag <IE>
-        $xml .= '<enderDest>';
-        // Aplica abreviação no logradouro do destinatário (limite de 60 caracteres)
-        $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
-        $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
-        $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
-        $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
-        $xml .= '<cMun>' . $dados['destinatario']['codMun'] . '</cMun>';
-        $xml .= '<xMun>' . htmlspecialchars($dados['destinatario']['cidade']) . '</xMun>';
-        $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['destinatario']['cep']) . '</CEP>';
-        $xml .= '<UF>' . htmlspecialchars($dados['destinatario']['uf']) . '</UF>';
-        $xml .= '</enderDest></dest>';
 
         $xml .= '<assinante><iCodAssinante>'. htmlspecialchars($dados['assinante']['CodAssinante']) .'</iCodAssinante><tpAssinante>'. htmlspecialchars($dados['assinante']['tpAssinante']) .'</tpAssinante><tpServUtil>'. htmlspecialchars($dados['assinante']['tpServUtil']) .'</tpServUtil><nContrato>'. htmlspecialchars($dados['assinante']['Contrato']) .'</nContrato><dContratoIni>'. htmlspecialchars($dados['assinante']['DtInicio']) .'</dContratoIni>';
         // if($dados['assinante']['tpServUtil'] == 1){
