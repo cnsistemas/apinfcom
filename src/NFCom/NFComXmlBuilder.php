@@ -432,7 +432,9 @@ class NFComXmlBuilder
         $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
         $xml .= '<cMun>' . $dados['destinatario']['codMun'] . '</cMun>';
         $xml .= '<xMun>' . htmlspecialchars($dados['destinatario']['cidade']) . '</xMun>';
-        $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['destinatario']['cep']) . '</CEP>';
+        if (!empty($dados['destinatario']['cep']) && preg_replace('/\D/', '', $dados['destinatario']['cep']) !== '00000000') {
+            $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['destinatario']['cep']) . '</CEP>';
+        }
         $xml .= '<UF>' . htmlspecialchars($dados['destinatario']['uf']) . '</UF>';
         $xml .= '</enderDest></dest>';
 
