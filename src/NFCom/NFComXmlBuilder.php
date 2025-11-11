@@ -427,9 +427,8 @@ class NFComXmlBuilder
         // ✅ ENDEREÇO (CEP define se é nacional ou internacional)
         // ===========================================================
         $cepLimpo = preg_replace('/\D/', '', $dados['destinatario']['cep']);
-        $isInternacional = ($cepLimpo === '00000000');
 
-        if ($isInternacional) {
+        if ($cepLimpo == '00000000') {
 
             // ======================================================
             // ✅ ENDEREÇO INTERNACIONAL
