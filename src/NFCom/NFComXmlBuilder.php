@@ -404,6 +404,7 @@ class NFComXmlBuilder
                 $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
                 $xml .= '<cMun>9999999</cMun>';
                 $xml .= '<xMun>EXTERIOR</xMun>';
+                $xml .= '<CEP>99999999</CEP>';
                 $xml .= '<UF>EX</UF>';
                 $xml .= '<cPais>00655</cPais>';
                 $xml .= '<xPais>ARUBA</xPais>';
