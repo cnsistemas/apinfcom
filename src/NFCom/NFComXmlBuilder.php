@@ -406,7 +406,7 @@ class NFComXmlBuilder
                 $xml .= '<xMun>EXTERIOR</xMun>';
                 $xml .= '<CEP>99999999</CEP>';
                 $xml .= '<UF>EX</UF>';
-                $xml .= '<cPais>00655</cPais>';
+                $xml .= '<cPais>0655</cPais>';
                 $xml .= '<xPais>ARUBA</xPais>';
             $xml .= '</enderDest></dest>';
         }else{
