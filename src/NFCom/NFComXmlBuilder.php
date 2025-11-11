@@ -398,14 +398,15 @@ class NFComXmlBuilder
             $xml .= '<idOutros>9999999</idOutros>';
             $xml .= '<indIEDest>9</indIEDest>';
             $xml .= '<enderDest>';
-                $xml .= '<cPais>00655</cPais>';
-                $xml .= '<xPais>ARUBA</xPais>';
+                $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
                 $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
                 $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
                 $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
                 $xml .= '<cMun>9999999</cMun>';
                 $xml .= '<xMun>EXTERIOR</xMun>';
                 $xml .= '<UF>EX</UF>';
+                $xml .= '<cPais>00655</cPais>';
+                $xml .= '<xPais>ARUBA</xPais>';
             $xml .= '</enderDest></dest>';
         }else{
             $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
