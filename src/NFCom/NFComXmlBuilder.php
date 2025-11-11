@@ -399,9 +399,9 @@ class NFComXmlBuilder
             $xml .= '<indIEDest>9</indIEDest>';
             $xml .= '<enderDest>';
                 $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
-                $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
                 $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
                 $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
+                $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
                 $xml .= '<cMun>9999999</cMun>';
                 $xml .= '<xMun>EXTERIOR</xMun>';
                 $xml .= '<UF>EX</UF>';
