@@ -428,7 +428,7 @@ class NFComXmlBuilder
         // ===========================================================
         $cepLimpo = preg_replace('/\D/', '', $dados['destinatario']['cep']);
 
-        if ($cepLimpo == '00000000') {
+        if ($cepLimpo == 00000000) {
 
             // ======================================================
             // ✅ ENDEREÇO INTERNACIONAL
