@@ -394,7 +394,7 @@ class NFComXmlBuilder
         // Aplica abreviação no nome do destinatário (limite de 60 caracteres)
         $nomeDestinatario = self::abrevia_xnome_nfcom($dados['destinatario']['nome'], 60);
         $xml .= '<dest><xNome>' . htmlspecialchars($nomeDestinatario) . '</xNome>';
-        if(preg_replace('/\D/', '', $dados['destinatario']['cep']) == 1){
+        if($dados['destinatario']['uf'] == "EX"){
             $xml .= '<endInter>';
                 $xml .= '<cPais>00655</cPais>';
                 $xml .= '<xPais>ARUBA</xPais>';
