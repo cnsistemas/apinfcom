@@ -463,7 +463,9 @@ class NFComXmlBuilder
         foreach ($dados['itens'] as $item) {
             $xml .= '<det nItem="' . intval($cont) . '"><prod>';
                 $xml .= '<cProd>' . htmlspecialchars($item['item']) . '</cProd>';
-                $xml .= '<xProd>' . preg_replace(['/\s+/', '/-/'], ' ', $item['descricao']).'</xProd>';
+                $desc = preg_replace('/[^\p{L}\p{N}\s.,]/u', ' ', $item['descricao']); 
+                $desc = preg_replace('/\s+/', ' ', trim($desc));
+                $xml .= '<xProd>' . htmlspecialchars($desc, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</xProd>';
                 $xml .= '<cClass>' . htmlspecialchars($item['cclass']) . '</cClass>';
                 $xml .= '<CFOP>' . htmlspecialchars($item['cfop']) . '</CFOP>';
                 $xml .= '<uMed>' . $item['uMed']. '</uMed>';
@@ -557,7 +559,7 @@ class NFComXmlBuilder
                                 $xml .= '<vFUNTTEL>' . number_format($item['impostos']['funttel']['funttel_valor'], 2, '.', '') . '</vFUNTTEL>';
                             $xml .= '</FUNTTEL>';
                         }
-                        if(isset($item['impostos']['retencao']['vRetPIS'])){
+                        if(isset($item['impostos']['retencao']['vIRRF'])){
                             $xml .= '<retTrib>';
                                 $xml .= '<vRetPIS>' . number_format($item['impostos']['retencao']['ret_pis'], 2, '.', '') . '</vRetPIS>';
                                 $xml .= '<vRetCofins>' . number_format($item['impostos']['retencao']['ret_cofins'], 2, '.', '') . '</vRetCofins>';
