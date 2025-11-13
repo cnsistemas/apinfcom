@@ -463,7 +463,7 @@ class NFComXmlBuilder
         foreach ($dados['itens'] as $item) {
             $xml .= '<det nItem="' . intval($cont) . '"><prod>';
                 $xml .= '<cProd>' . htmlspecialchars($item['item']) . '</cProd>';
-                $xml .= '<xProd>' . htmlspecialchars($item['descricao']) . '</xProd>';
+                $xml .= '<xProd>' . preg_replace(['/\s+/', '/-/'], ' ', $item['descricao']).'</xProd>';
                 $xml .= '<cClass>' . htmlspecialchars($item['cclass']) . '</cClass>';
                 $xml .= '<CFOP>' . htmlspecialchars($item['cfop']) . '</CFOP>';
                 $xml .= '<uMed>' . $item['uMed']. '</uMed>';
