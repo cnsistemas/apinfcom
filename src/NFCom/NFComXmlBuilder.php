@@ -413,33 +413,48 @@ class NFComXmlBuilder
             $cpfcnpj = preg_replace('/\D/', '', $dados['destinatario']['cpfcnpj']);
             $xml .= strlen(self::limparNumeros($cpfcnpj)) == 11 ? '<CPF>' . self::limparNumeros($cpfcnpj) . '</CPF>' : '<CNPJ>' . self::limparNumeros($cpfcnpj) . '</CNPJ>';
             
-            // Lógica de IE: se IE estiver vazia ou for "ISENTO"/"ISENTA", usar indIEDest = 9 e não incluir tag <IE>
+            // ----- Lógica de IE / indIEDest -----
             $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
             $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
-            
-            // Se IE estiver vazia ou for 'ISENTO'/'ISENTA', sempre definir indIEDest = 9 (Não contribuinte)
-            if (empty($ie) || strtoupper($ie) === 'ISENTO' || strtoupper($ie) === 'ISENTA') {
-                $indIEDest = 9;
-            } else {
-                // Se IE está preenchida e indIEDest não foi informado, assumir 1 (contribuinte)
-                if ($indIEDest === null) {
-                    $indIEDest = 1;
+
+            // Normaliza o texto para comparação
+            $ieUpper = strtoupper($ie);
+
+            // Regras oficiais SEFAZ (indIEDest):
+            // 1 = Contribuinte ICMS (tem IE)
+            // 2 = Contribuinte isento de IE
+            // 9 = Não contribuinte (ex: consumidor final ou pessoa física)
+
+            // --- Definição automática de indIEDest ---
+            if (empty($ie) || $ieUpper === 'ISENTO' || $ieUpper === 'ISENTA') {
+                // Se campo IE vazio ou "ISENTO"/"ISENTA"
+                // Se tiver CNPJ → é contribuinte isento (2)
+                // Se tiver CPF → é não contribuinte (9)
+                if (!empty($dados['destinatario']['cnpj'])) {
+                    $indIEDest = 2; // contribuinte isento
+                } else {
+                    $indIEDest = 9; // não contribuinte (pessoa física)
                 }
+            } else {
+                // Se IE preenchida, é contribuinte normal
+                $indIEDest = 1;
             }
-            
-            // Se ainda não foi definido, usar 9 como padrão (não contribuinte)
+
+            // Se ainda não foi definido, usa 9 por padrão
             if ($indIEDest === null) {
                 $indIEDest = 9;
             }
-            
+
+            // --- Monta tags ---
             $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
-            
-            // Só incluir tag <IE> se indIEDest for 1 (contribuinte) e IE estiver preenchida
-            // Quando IE vazia ou "ISENTO"/"ISENTA" ou indIEDest = 9, não informar a tag <IE>
-            if ($indIEDest == 1 && !empty($ie) && strtoupper($ie) !== 'ISENTO' && strtoupper($ie) !== 'ISENTA') {
+
+            // IE obrigatória somente se for contribuinte (1)
+            if ($indIEDest == 1 && !empty($ie)) {
                 $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
             }
-            if($indIEDest == 2){
+
+            // Se indIEDest = 2 (isento), a SEFAZ exige a tag IE com valor "ISENTO"
+            if ($indIEDest == 2) {
                 $xml .= '<IE>ISENTO</IE>';
             }
             // Se indIEDest = 9 ou IE vazia/ISENTO/ISENTA, não incluir a tag <IE>
