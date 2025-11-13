@@ -489,6 +489,7 @@ class NFComXmlBuilder
                 $xml .= '<uMed>' . $item['uMed']. '</uMed>';
                 $xml .= '<qFaturada>' . number_format($item['quantidade'], 2, '.', '') . '</qFaturada>';
                 $xml .= '<vItem>' . number_format($item['unitario'], 2, '.', '') . '</vItem>';
+                $xml .= '<vDesc>' . number_format($item['vDesc'], 2, '.', '') . '</vDesc>';
                 $xml .= '<vProd>' . number_format($item['total'], 2, '.', '') . '</vProd>';
                 $xml .= '</prod>';
                 if($dados['emitente']['CRT'] == 1){
