@@ -439,6 +439,9 @@ class NFComXmlBuilder
             if ($indIEDest == 1 && !empty($ie) && strtoupper($ie) !== 'ISENTO' && strtoupper($ie) !== 'ISENTA') {
                 $xml .= '<IE>' . self::limparNumeros($ie) . '</IE>';
             }
+            if($indIEDest == 2){
+                $xml .= '<IE>ISENTO</IE>';
+            }
             // Se indIEDest = 9 ou IE vazia/ISENTO/ISENTA, não incluir a tag <IE>
             $xml .= '<enderDest>';
             // Aplica abreviação no logradouro do destinatário (limite de 60 caracteres)
