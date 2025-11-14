@@ -381,7 +381,11 @@ class NFComXmlBuilder
         // Aplica abreviação no logradouro do emitente (limite de 60 caracteres)
         $logradouroEmitente = self::abrevia_logradouro_nfcom($dados['emitente']['endereco'], 60);
         $xml .= '<xLgr>' . htmlspecialchars($logradouroEmitente) . '</xLgr>';
-        $xml .= '<nro>' . htmlspecialchars($dados['emitente']['numero']) . '</nro>';
+        if($dados['emitente']['numero'] == "" || $dados['emitente']['numero'] == null){
+            $xml .= '<nro>S/N</nro>';
+        }else{
+            $xml .= '<nro>' . htmlspecialchars($dados['emitente']['numero']) . '</nro>';
+        }
         $xml .= '<xBairro>' . htmlspecialchars($dados['emitente']['bairro']) . '</xBairro>';
         $xml .= '<cMun>' . $cMunFG . '</cMun>';
         $xml .= '<xMun>' . htmlspecialchars($dados['emitente']['cidade']) . '</xMun>';
@@ -462,7 +466,11 @@ class NFComXmlBuilder
             // Aplica abreviação no logradouro do destinatário (limite de 60 caracteres)
             $logradouroDestinatario = self::abrevia_logradouro_nfcom($dados['destinatario']['endereco'], 60);
             $xml .= '<xLgr>' . htmlspecialchars($logradouroDestinatario) . '</xLgr>';
-            $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
+            if($dados['destinatario']['numero'] == "" || $dados['destinatario']['numero'] == null){
+                $xml .= '<nro>S/N</nro>';
+            }else{
+                $xml .= '<nro>' . htmlspecialchars($dados['destinatario']['numero']) . '</nro>';
+            }
             $xml .= '<xBairro>' . htmlspecialchars($dados['destinatario']['bairro']) . '</xBairro>';
             $xml .= '<cMun>' . $dados['destinatario']['codMun'] . '</cMun>';
             $xml .= '<xMun>' . htmlspecialchars($dados['destinatario']['cidade']) . '</xMun>';
