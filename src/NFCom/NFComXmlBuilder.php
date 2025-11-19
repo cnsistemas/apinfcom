@@ -586,7 +586,7 @@ class NFComXmlBuilder
                                 $xml .= '<vFUNTTEL>' . number_format($item['impostos']['funttel']['funttel_valor'], 2, '.', '') . '</vFUNTTEL>';
                             $xml .= '</FUNTTEL>';
                         }
-                        if(isset($item['impostos']['retencao']['vIRRF'])){
+                        if(isset($item['impostos']['retencao']['ret_irrf_val'])){
                             $xml .= '<retTrib>';
                                 $xml .= '<vRetPIS>' . number_format($item['impostos']['retencao']['ret_pis'], 2, '.', '') . '</vRetPIS>';
                                 $xml .= '<vRetCofins>' . number_format($item['impostos']['retencao']['ret_cofins'], 2, '.', '') . '</vRetCofins>';
