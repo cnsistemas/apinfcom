@@ -105,6 +105,49 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
         return $response->withHeader('Content-Type', 'application/json');
     });
 
+    $group->post('/xml', function (Request $request, Response $response) {
+        $dados = json_decode($request->getBody()->getContents(), true);
+        if (!is_array($dados)) {
+            // 🚀 CORRIGIDO: Usando ->getBody()->write()
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
+                ->getBody()->write(json_encode(['error' => 'JSON inválido.']));
+        }
+
+        $token = $request->getHeaderLine('X-Client-Id');
+        $ambiente = $request->getHeaderLine('X-Ambiente');
+        $pdo = getConnection();
+
+        // Verifica se o token existe
+        $stmt = $pdo->prepare("SELECT * FROM clientes WHERE CHAVE = ?");
+        $stmt->execute([$token]);
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($usuario['CHAVE'] == $token) {
+            $conn = getConnectionNF($usuario);
+        }else{
+            $response->getBody()->write(json_encode(['error' => 'Credenciais inválidas']));
+            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+            die();
+        }
+        
+        
+        try {
+            $cnpj = getOption($conn, 'invoice_company_cnpj');
+            $senha = getOption($conn, 'settings_sales_cron_nfe_password_certificate');
+            $emissor = new NFComEmissao($cnpj, $senha, $ambiente);
+            $res = $emissor->xml($dados, $ambiente);
+            $response->getBody()->write(json_encode($res, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200); // Define o status HTTP 200 (OK)
+
+        } catch (Exception $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withStatus(400);
+        }
+
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
     $group->post('/cancelar', function (Request $request, Response $response) {
         $dados = json_decode($request->getBody()->getContents(), true);
 

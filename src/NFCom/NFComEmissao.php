@@ -66,4 +66,24 @@ class NFComEmissao
         }
     }
 
+    public function xml(array $dados, $ambiente)
+    {
+        try {
+            // 1. CNPJ do emitente vindo do JSON
+            $cnpjEmit = preg_replace('/\D/', '', $dados['emitente']['cnpj']);
+
+            // 2. Gera o XML da NFCom
+            $xml = NFComXmlBuilder::gerarXmlNFCom($dados, $cnpjEmit, $ambiente);
+            // 1. Define o cabeçalho para texto simples
+            return json_decode(json_encode($xml, JSON_UNESCAPED_UNICODE), true);
+
+
+        } catch (\Exception $e) {
+            return [
+                'status' => 'erro',
+                'mensagem' => $e->getMessage()
+            ];
+        }
+    }
+
 }
