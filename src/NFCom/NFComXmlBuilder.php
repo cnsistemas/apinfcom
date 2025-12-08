@@ -343,13 +343,15 @@ class NFComXmlBuilder
         $cNF7 = self::gerarCNF2();
 
         // Gera chave de acesso com cNF8 (8 dígitos)
-        $chaveAcesso = self::gerarChaveAcessoNFCom($cnpjEmit, $serie, $nNF, $cNF7, $cUF);
+        $chaveAcesso = !empty($dados['chave_acesso']) ? $dados['chave_acesso'] : self::gerarChaveAcessoNFCom($cnpjEmit, $serie, $nNF, $cNF7, $cUF);
 
         // Calcula DV
         $cDV = substr($chaveAcesso, -1);
 
         // Aplica o cNF correto (7 dígitos) no XML
-        $dados['cNF'] = $cNF7;
+        // Se existir chave fornecida, extrai o cNF dela; senão usa o cNF7 original
+        $dados['cNF'] = !empty($dados['chave_acesso']) ? substr($dados['chave_acesso'], -8, 7) : $cNF7;
+
 
 
 
