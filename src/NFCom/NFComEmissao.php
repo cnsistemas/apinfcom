@@ -74,8 +74,9 @@ class NFComEmissao
 
             // 2. Gera o XML da NFCom
             $xml = NFComXmlBuilder::gerarXmlNFCom($dados, $cnpjEmit, $ambiente);
+            $xmlAssinado = $this->tools->assinarXML(trim($xml), 'infNFCom');
             // 1. Define o cabeçalho para texto simples
-            return json_decode(json_encode($xml, JSON_UNESCAPED_UNICODE), true);
+            return json_decode(json_encode($xmlAssinado, JSON_UNESCAPED_UNICODE), true);
 
 
         } catch (\Exception $e) {

@@ -12,8 +12,7 @@ class NFComConsulta
     {
         // 1. Montar XML de consulta
         $tpAmb = $ambiente === 'producao' ? '1' : '2';
-        $xmlConsulta = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            . "<consSitNFCom xmlns=\"http://www.portalfiscal.inf.br/nfcom\" versao=\"1.00\">"
+        $xmlConsulta =  "<consSitNFCom xmlns=\"http://www.portalfiscal.inf.br/nfcom\" versao=\"1.00\">"
                 . "<tpAmb>{$tpAmb}</tpAmb>"
                 . "<xServ>CONSULTAR</xServ>"
                 . "<chNFCom>{$chave}</chNFCom>"
