@@ -336,7 +336,7 @@ class NFComXmlBuilder
         $tpFat = 0;
         $verProc = '1.0';
         $procEmi = 0;
-        $dhEmi = date('Y-m-d\TH:i:sP');
+        $dhEmi = $dados['emissao'] ?? date('Y-m-d\TH:i:sP');
         $prepago = $dados['pre-pago'];
         $cont = 1;
 
