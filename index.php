@@ -195,10 +195,25 @@ $app->group('/nfcom', function (RouteCollectorProxy $group) {
         $chave = $args['chave'];
         $params = $request->getQueryParams();
 
+        $token = $request->getHeaderLine('X-Client-Id');
+        $ambiente = $request->getHeaderLine('X-Ambiente');
+        $pdo = getConnection();
+
+        // Verifica se o token existe
+        $stmt = $pdo->prepare("SELECT * FROM clientes WHERE CHAVE = ?");
+        $stmt->execute([$token]);
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($usuario['CHAVE'] == $token) {
+            $conn = getConnectionNF($usuario);
+        }else{
+            $response->getBody()->write(json_encode(['error' => 'Credenciais inválidas']));
+            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+            die();
+        }
+
         try {
-            $cnpj = $params['cnpj'] ?? '';
-            $senha = $params['senha'] ?? '';
-            $ambiente = $params['ambiente'] ?? 'homologacao';
+            $cnpj = getOption($conn, 'invoice_company_cnpj');
+            $senha = getOption($conn, 'settings_sales_cron_nfe_password_certificate');
             if (!$cnpj || !$senha) {
                 throw new Exception('CNPJ e senha são obrigatórios na consulta.');
             }
@@ -347,9 +362,13 @@ function getConnectionNF($conn){
     $driver = $_ENV['DB_DRIVER'];
     $host = $conn['SERVIDOR'];
     $port = $_ENV['DB_PORT'];
-    $db   = $conn['BANCO'];;
-    $user = $conn['USUARIO'];;
-    $pass = decryptData($conn['SENHA']);
+    $db   = $conn['BANCO'];
+    $user = $conn['USUARIO'];
+    if($conn['SERVIDOR'] == "127.0.0.1"){
+        $pass = $conn['SENHA'];
+    }else{
+        $pass = decryptData($conn['SENHA']);
+    }
 
     $dsn = "$driver:host=$host;port=$port;dbname=$db;charset=utf8";
     return new PDO($dsn, $user, $pass, [
