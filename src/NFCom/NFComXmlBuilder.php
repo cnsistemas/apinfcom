@@ -344,6 +344,7 @@ class NFComXmlBuilder
 
         // Gera chave de acesso com cNF8 (8 dígitos)
         $chaveAcesso = !empty($dados['chave_acesso']) ? 'NFCom'.$dados['chave_acesso'] : self::gerarChaveAcessoNFCom($cnpjEmit, $serie, $nNF, $cNF7, $cUF);
+        var_dump($chaveAcesso);die();
 
         // Calcula DV
         $cDV = substr($chaveAcesso, -1);
