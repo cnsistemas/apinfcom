@@ -81,9 +81,10 @@ class NFComXmlBuilder
         return $dv;
     }
 
-    public static function gerarChaveAcessoNFCom($cnpjEmitente, $serie, $nNF, $cNF7, $cUF)
+    public static function gerarChaveAcessoNFCom($dhEmi,$cnpjEmitente, $serie, $nNF, $cNF7, $cUF)
     {
-        $AAMM = date('ym'); // Ano e mês da emissão
+        $timestamp = strtotime($dhEmi);// AAMM baseado na dhEmi
+        $AAMM = date('ym', $timestamp);
         $mod = '62';
         $tpEmis = '1';
         $nSiteAutoriz = '0';
@@ -343,7 +344,7 @@ class NFComXmlBuilder
         $cNF7 = self::gerarCNF2();
 
         // Gera chave de acesso com cNF8 (8 dígitos)
-        $chaveAcesso = !empty($dados['chave_acesso']) ? 'NFCom'.$dados['chave_acesso'] : self::gerarChaveAcessoNFCom($cnpjEmit, $serie, $nNF, $cNF7, $cUF);
+        $chaveAcesso = !empty($dados['chave_acesso']) ? 'NFCom'.$dados['chave_acesso'] : self::gerarChaveAcessoNFCom($dhEmi,$cnpjEmit, $serie, $nNF, $cNF7, $cUF);
 
         // Calcula DV
         $cDV = substr($chaveAcesso, -1);
