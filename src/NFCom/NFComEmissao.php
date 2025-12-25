@@ -28,11 +28,11 @@ class NFComEmissao
             // 1. Define o cabeçalho para texto simples
             // header('Content-Type: text/plain'); 
 
-            // 2. Exibe o XML dentro de tags <pre> para manter a formatação
-            echo "<pre>";
-            echo htmlspecialchars($xml);
-            echo "</pre>";
-            die();
+            // // 2. Exibe o XML dentro de tags <pre> para manter a formatação
+            // echo "<pre>";
+            // echo htmlspecialchars($xml);
+            // echo "</pre>";
+            // die();
 
             // 3. Assina o XML usando o Signer (via NFComTools)
             $xmlAssinado = $this->tools->assinarXML(trim($xml), 'infNFCom');
