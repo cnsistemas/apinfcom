@@ -659,10 +659,10 @@ class NFComXmlBuilder
                                 $xml .= '<vIBSMun>' . number_format($dados['totais']['ibs_total_mun'], 2, '.', '') . '</vIBSMun>';
                             $xml .= '</gIBSMun>';
                             $xml .= '<vIBS>' . number_format($dados['totais']['ibs_total'], 2, '.', '') . '</vIBS>';
-                        $xml .= '<gIBS>';
+                        $xml .= '</gIBS>';
                         $xml .= '<gCBS>';
                             $xml .= '<vCBS>' . number_format($dados['totais']['cbs_total'], 2, '.', '') . '</vCBS>';
-                        $xml .= '<gCBS>';
+                        $xml .= '</gCBS>';
                 $xml .= '</IBSCBSTot>';   
             } 
         $xml .= '</total>';
