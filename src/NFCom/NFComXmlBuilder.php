@@ -598,6 +598,28 @@ class NFComXmlBuilder
                                 $xml .= '<vIRRF>' . number_format($item['impostos']['retencao']['ret_irrf_val'], 2, '.', '') . '</vIRRF>';
                             $xml .= '</retTrib>';
                         }
+                        if(isset($item['impostos']['ibscbs']['cst'])){
+                            $xml .= '<IBSCBS>';
+                                $xml .= '<CST>'.$item['impostos']['ibscbs']['cst'].'</CST>';
+                                $xml .= '<cClassTrib>'.$item['impostos']['ibscbs']['cClassTrib'].'</cClassTrib>';
+                                $xml .= '<gIBSCBS>';
+                                    $xml .= '<vBC>' . number_format($item['impostos']['ibscbs']['ibscbs_bc'], 2, '.', '') . '</vBC>';
+                                $xml .= '</gIBSCBS>';
+                                $xml .= '<gIBSUF>';
+                                    $xml .= '<pIBSUF>' . number_format($item['impostos']['ibs']['ibs_aliq_uf'], 2, '.', '') . '</pIBSUF>';
+                                    $xml .= '<vIBSUF>' . number_format($item['impostos']['ibs']['ibs_valor_uf'], 2, '.', '') . '</vIBSUF>';
+                                $xml .= '</gIBSUF>';
+                                $xml .= '<gIBSMun>';
+                                    $xml .= '<pIBSMun>' . number_format($item['impostos']['ibs']['ibs_aliq_mun'], 2, '.', '') . '</pIBSMun>';
+                                    $xml .= '<vIBSMun>' . number_format($item['impostos']['ibs']['ibs_valor_mun'], 2, '.', '') . '</vIBSMun>';
+                                $xml .= '</gIBSMun>';
+                                $xml .= '<vIBS>' . number_format($item['impostos']['ibs']['ibs_valor'], 2, '.', '') . '</vIBS>';
+                                $xml .= '<gCBS>';
+                                    $xml .= '<pCBS>' . number_format($item['impostos']['cbs']['cbs_aliq'], 2, '.', '') . '</pCBS>';
+                                    $xml .= '<vCBS>' . number_format($item['impostos']['cbs']['cbs_valor'], 2, '.', '') . '</vCBS>';
+                                $xml .= '</gCBS>';
+                            $xml .= '</IBSCBS>';
+                        }
                     $xml .= '</imposto>';
                     }
                 }
@@ -626,6 +648,23 @@ class NFComXmlBuilder
                 $xml .= '<vDesc>' . number_format($dados['totais']['desconto'], 2, '.', '') . '</vDesc>';
                 $xml .= '<vOutro>' . number_format($dados['totais']['outros'], 2, '.', '') . '</vOutro>';
                 $xml .= '<vNF>' . number_format($dados['totais']['total_nf'], 2, '.', '') . '</vNF>';
+            if(isset($item['impostos']['ibscbs']['cst'])){
+                $xml .= '<IBSCBSTot>';
+                    $xml .= '<vBCIBSCBS>' . number_format($dados['totais']['bc_ibs_cbs'], 2, '.', '') . '</vBCIBSCBS>';
+                        $xml .= '<gIBS>';
+                            $xml .= '<gIBSUF>';
+                                $xml .= '<vIBSUF>' . number_format($dados['totais']['ibs_total_uf'], 2, '.', '') . '</vIBSUF>';
+                            $xml .= '</gIBSUF>';
+                            $xml .= '<gIBSMun>';
+                                $xml .= '<vIBSMun>' . number_format($dados['totais']['ibs_total_mun'], 2, '.', '') . '</vIBSMun>';
+                            $xml .= '</gIBSMun>';
+                            $xml .= '<vIBS>' . number_format($dados['totais']['ibs_total'], 2, '.', '') . '</vIBS>';
+                        $xml .= '<gIBS>';
+                        $xml .= '<gCBS>';
+                            $xml .= '<vCBS>' . number_format($dados['totais']['cbs_total'], 2, '.', '') . '</vCBS>';
+                        $xml .= '<gCBS>';
+                $xml .= '</IBSCBSTot>';   
+            } 
         $xml .= '</total>';
        
 
