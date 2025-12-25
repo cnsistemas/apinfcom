@@ -605,11 +605,11 @@ class NFComXmlBuilder
                                 $xml .= '<gIBSCBS>';
                                     $xml .= '<vBC>' . number_format($item['impostos']['ibscbs']['ibscbs_bc'], 2, '.', '') . '</vBC>';
                                     $xml .= '<gIBSUF>';
-                                        //$xml .= '<pIBSUF>' . number_format($item['impostos']['ibs']['ibs_aliq_uf'], 2, '.', '') . '</pIBSUF>';
+                                        $xml .= '<pIBSUF>' . number_format($item['impostos']['ibs']['ibs_aliq_uf'], 2, '.', '') . '</pIBSUF>';
                                         $xml .= '<vIBSUF>' . number_format($item['impostos']['ibs']['ibs_valor_uf'], 2, '.', '') . '</vIBSUF>';
                                     $xml .= '</gIBSUF>';
                                     $xml .= '<gIBSMun>';
-                                        //$xml .= '<pIBSMun>' . number_format($item['impostos']['ibs']['ibs_aliq_mun'], 2, '.', '') . '</pIBSMun>';
+                                        $xml .= '<pIBSMun>' . number_format($item['impostos']['ibs']['ibs_aliq_mun'], 2, '.', '') . '</pIBSMun>';
                                         $xml .= '<vIBSMun>' . number_format($item['impostos']['ibs']['ibs_valor_mun'], 2, '.', '') . '</vIBSMun>';
                                     $xml .= '</gIBSMun>';
                                     $xml .= '<vIBS>' . number_format($item['impostos']['ibs']['ibs_valor'], 2, '.', '') . '</vIBS>';
