@@ -602,7 +602,7 @@ class NFComXmlBuilder
                             $xml .= '<IBSCBS>';
                                 $xml .= '<CST>'.$item['impostos']['ibscbs']['cst'].'</CST>';
                                 $xml .= '<cClassTrib>'.$item['impostos']['ibscbs']['cClassTrib'].'</cClassTrib>';
-                                if($item['impostos']['ibscbs']['cst'] != "000"){
+                                if($item['impostos']['ibscbs']['cst'] == "000"){
                                     $xml .= '<gIBSCBS>';
                                         $xml .= '<vBC>' . number_format($item['impostos']['ibscbs']['ibscbs_bc'], 2, '.', '') . '</vBC>';
                                         $xml .= '<gIBSUF>';
