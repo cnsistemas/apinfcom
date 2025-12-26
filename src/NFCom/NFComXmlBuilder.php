@@ -672,8 +672,8 @@ class NFComXmlBuilder
                             $xml .= '<vCBS>' . number_format($dados['totais']['cbs_total'], 2, '.', '') . '</vCBS>';
                         $xml .= '</gCBS>';
                 $xml .= '</IBSCBSTot>';   
+                $xml .= '<vTotDFe>' . number_format($dados['totais']['total_dfe'], 2, '.', '') . '</vTotDFe>'; 
             }
-            $xml .= '<vTotDFe>' . number_format($dados['totais']['total_dfe'], 2, '.', '') . '</vTotDFe>'; 
         $xml .= '</total>';
        
 
