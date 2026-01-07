@@ -449,7 +449,7 @@ class NFComXmlBuilder
             }
 
             // Se indIEDest = 2 (isento), a SEFAZ exige a tag IE com valor "ISENTO"
-            if ($indIEDest == 2) {
+            if (!in_array($dados['destinatario']['uf'], $ufsNaoAceitamIsento) && $indIEDest == 2) {
                 $xml .= '<IE>ISENTO</IE>';
             }
             // Se indIEDest = 9 ou IE vazia/ISENTO/ISENTA, não incluir a tag <IE>
