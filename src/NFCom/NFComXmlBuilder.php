@@ -424,6 +424,14 @@ class NFComXmlBuilder
             $ie = isset($dados['destinatario']['ie']) ? trim($dados['destinatario']['ie']) : '';
             $indIEDest = isset($dados['destinatario']['indIEDest']) ? intval($dados['destinatario']['indIEDest']) : null;
 
+            // Lista de UFs que não aceitam indIEDest = 2 (Isento)
+            $ufsNaoAceitamIsento = ['AM', 'BA', 'CE', 'GO', 'MG', 'MS', 'MT', 'PE', 'RN', 'SE', 'SP'];
+
+            // Se a UF estiver na lista e o indicador for 2, altera para 9 (Não Contribuinte)
+            if (in_array($dados['destinatario']['uf'], $ufsNaoAceitamIsento) && $indIEDest == 2) {
+                $indIEDest = 9;
+            }
+
             // Normaliza o texto para comparação
             $ieUpper = strtoupper($ie);
 
