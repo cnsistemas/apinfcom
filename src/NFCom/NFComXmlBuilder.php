@@ -432,26 +432,6 @@ class NFComXmlBuilder
             // 2 = Contribuinte isento de IE
             // 9 = Não contribuinte (ex: consumidor final ou pessoa física)
 
-            // --- Definição automática de indIEDest ---
-            if (empty($ie) || $ieUpper === 'ISENTO' || $ieUpper === 'ISENTA') {
-                // Se campo IE vazio ou "ISENTO"/"ISENTA"
-                // Se tiver CNPJ → é contribuinte isento (2)
-                // Se tiver CPF → é não contribuinte (9)
-                if (!empty($dados['destinatario']['cnpj'])) {
-                    $indIEDest = 2; // contribuinte isento
-                } else {
-                    $indIEDest = 9; // não contribuinte (pessoa física)
-                }
-            } else {
-                // Se IE preenchida, é contribuinte normal
-                $indIEDest = 1;
-            }
-
-            // Se ainda não foi definido, usa 9 por padrão
-            if ($indIEDest === null) {
-                $indIEDest = 9;
-            }
-
             // --- Monta tags ---
             $xml .= '<indIEDest>' . $indIEDest . '</indIEDest>';
 
