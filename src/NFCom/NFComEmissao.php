@@ -76,34 +76,45 @@ class NFComEmissao
             // 2. Gera o XML da NFCom
             $xml = NFComXmlBuilder::gerarXmlNFCom($dados, $cnpjEmit, $ambiente);
             $xmlAssinado = $this->tools->assinarXML(trim($xml), 'infNFCom');
-            $xml2 = NFComConsulta::consultar($dados['chave_acesso'], $dados['emitente']['cnpj'], $senha, $ambiente);
-            if($xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['cStat'] == "101"){
+            if(isset($dados['cstat'])){
                 $xml3 = '<protNFCom xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">
-                <infProt Id="'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['@attributes']['Id'].'">
-                    <tpAmb>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['tpAmb'].'</tpAmb>
-                    <verAplic>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['verAplic'].'</verAplic>
-                    <chNFCom>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['chNFCom'].'</chNFCom>
-                    <dhRecbto>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['dhRecbto'].'</dhRecbto>
-                    <nProt>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['nProt'].'</nProt>
-                    <digVal>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['digVal'].'</digVal>
-                    <cStat>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['cStat'].'</cStat>
-                    <xMotivo>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['xMotivo'].'</xMotivo>
-                </infProt>
-            </protNFCom>';
+                        <chNFCom>'.$dados['chave_acesso'].'</chNFCom>
+                        <nProt>'.$dados['nProt'].'</nProt>
+                        <cStat>'.$dados['cstat'].'</cStat>
+                        <xMotivo>'.$dados['xMotivo'].'</xMotivo>
+                    </infProt>
+                </protNFCom>';
             }else{
-                $xml3 = '<protNFCom xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">
-                <infProt Id="'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['@attributes']['Id'].'">
-                    <tpAmb>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['tpAmb'].'</tpAmb>
-                    <verAplic>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['verAplic'].'</verAplic>
-                    <chNFCom>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['chNFCom'].'</chNFCom>
-                    <dhRecbto>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['dhRecbto'].'</dhRecbto>
-                    <nProt>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['nProt'].'</nProt>
-                    <digVal>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['digVal'].'</digVal>
-                    <cStat>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['cStat'].'</cStat>
-                    <xMotivo>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['xMotivo'].'</xMotivo>
-                </infProt>
-            </protNFCom>';
+                $xml2 = NFComConsulta::consultar($dados['chave_acesso'], $dados['emitente']['cnpj'], $senha, $ambiente);
+                if($xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['cStat'] == "101"){
+                    $xml3 = '<protNFCom xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">
+                    <infProt Id="'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['@attributes']['Id'].'">
+                        <tpAmb>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['tpAmb'].'</tpAmb>
+                        <verAplic>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['verAplic'].'</verAplic>
+                        <chNFCom>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['chNFCom'].'</chNFCom>
+                        <dhRecbto>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['dhRecbto'].'</dhRecbto>
+                        <nProt>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['nProt'].'</nProt>
+                        <digVal>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['digVal'].'</digVal>
+                        <cStat>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['cStat'].'</cStat>
+                        <xMotivo>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['xMotivo'].'</xMotivo>
+                    </infProt>
+                </protNFCom>';
+                }else{
+                    $xml3 = '<protNFCom xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">
+                    <infProt Id="'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['@attributes']['Id'].'">
+                        <tpAmb>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['tpAmb'].'</tpAmb>
+                        <verAplic>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['verAplic'].'</verAplic>
+                        <chNFCom>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['chNFCom'].'</chNFCom>
+                        <dhRecbto>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['dhRecbto'].'</dhRecbto>
+                        <nProt>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['nProt'].'</nProt>
+                        <digVal>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['digVal'].'</digVal>
+                        <cStat>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['cStat'].'</cStat>
+                        <xMotivo>'.$xml2['Body']['nfcomResultMsg']['retConsSitNFCom']['protNFCom']['infProt']['xMotivo'].'</xMotivo>
+                    </infProt>
+                </protNFCom>';
+                }
             }
+            
             // $protocolo contém o XML retornado pela Sefaz (como você enviou)
             
             $protocolo = trim($xml3); // texto XML do protocolo
