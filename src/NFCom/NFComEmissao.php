@@ -78,7 +78,7 @@ class NFComEmissao
             $xmlAssinado = $this->tools->assinarXML(trim($xml), 'infNFCom');
             if(isset($dados['cstat'])){
                 $xml3 = '<protNFCom xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">
-                <infProt">
+                <infProt Id="Nfcom'.$dados['chave_acesso'].'">
                         <chNFCom>'.$dados['chave_acesso'].'</chNFCom>
                         <nProt>'.$dados['nProt'].'</nProt>
                         <cStat>'.$dados['cstat'].'</cStat>
