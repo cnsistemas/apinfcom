@@ -496,7 +496,7 @@ class NFComXmlBuilder
                 if($dados['emitente']['CRT'] == 1){
                     if(isset($item['impostos']['indSemCST'])){
                         $xml .= '<imposto>';
-                            $xmç .= '<indSemCST>1</indSemCST>';
+                            $xml .= '<indSemCST>1</indSemCST>';
                         $xml .= '</imposto>';
                     }else{
                         $xml .= '<imposto><ICMSSN><CST>90</CST><indSN>1</indSN>';
@@ -621,7 +621,7 @@ class NFComXmlBuilder
                     $xml .= '</imposto>';
                     }else if(isset($item['impostos']['indSemCST'])){
                         $xml .= '<imposto>';
-                            $xmç .= '<indSemCST>1</indSemCST>';
+                            $xml .= '<indSemCST>1</indSemCST>';
                         $xml .= '</imposto>';
                     }
                 }
