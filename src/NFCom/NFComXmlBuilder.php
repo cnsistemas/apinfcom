@@ -494,8 +494,14 @@ class NFComXmlBuilder
                 $xml .= '<vProd>' . number_format($item['total'], 2, '.', '') . '</vProd>';
                 $xml .= '</prod>';
                 if($dados['emitente']['CRT'] == 1){
-                    $xml .= '<imposto><ICMSSN><CST>90</CST><indSN>1</indSN>';
-                    $xml .= '</ICMSSN></imposto>';
+                    if(isset($item['impostos']['indSemCST'])){
+                        $xml .= '<imposto>';
+                            $xmç .= '<indSemCST>1</indSemCST>';
+                        $xml .= '</imposto>';
+                    }else{
+                        $xml .= '<imposto><ICMSSN><CST>90</CST><indSN>1</indSN>';
+                        $xml .= '</ICMSSN></imposto>';
+                    }
                 }else{
                     if(isset($item['impostos']['tipo_icms'])){
                         $xml .= '<imposto>';
