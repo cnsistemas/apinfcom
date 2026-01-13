@@ -484,7 +484,9 @@ class NFComXmlBuilder
                 $desc = preg_replace('/\s+/', ' ', trim($desc));
                 $xml .= '<xProd>' . htmlspecialchars($desc, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</xProd>';
                 $xml .= '<cClass>' . htmlspecialchars($item['cclass']) . '</cClass>';
-                $xml .= '<CFOP>' . htmlspecialchars($item['cfop']) . '</CFOP>';
+                if(isset($item['cfop'])){
+                    $xml .= '<CFOP>' . htmlspecialchars($item['cfop']) . '</CFOP>';
+                }
                 $xml .= '<uMed>' . $item['uMed']. '</uMed>';
                 $xml .= '<qFaturada>' . number_format($item['quantidade'], 2, '.', '') . '</qFaturada>';
                 $xml .= '<vItem>' . number_format($item['unitario'], 2, '.', '') . '</vItem>';
@@ -497,26 +499,26 @@ class NFComXmlBuilder
                 }else{
                     if(isset($item['impostos']['tipo_icms'])){
                         $xml .= '<imposto>';
-                    switch ($item['impostos']['tipo_icms']) {
-                        case '00':
-                            $icms = "ICMS00";
-                            break;
-                        case '20':
-                            $icms = "ICMS20";
-                            break;
-                        case '40':
-                            $icms = "ICMS40";
-                            break;
-                        case '51':
-                            $icms = "ICMS51";
-                            break;
-                        case '90':
-                            $icms = "ICMS00";
-                            break;
-                        default:
-                            $icms = "ICMS00";
-                            break;
-                    }
+                        switch ($item['impostos']['tipo_icms']) {
+                            case '00':
+                                $icms = "ICMS00";
+                                break;
+                            case '20':
+                                $icms = "ICMS20";
+                                break;
+                            case '40':
+                                $icms = "ICMS40";
+                                break;
+                            case '51':
+                                $icms = "ICMS51";
+                                break;
+                            case '90':
+                                $icms = "ICMS00";
+                                break;
+                            default:
+                                $icms = "ICMS00";
+                                break;
+                        }
                         $xml .= '<'.$icms.'>';
                             $xml .= '<CST>' . $item['impostos']['cst'] . '</CST>';
                             if($icms == 'ICMS20'){
@@ -611,6 +613,10 @@ class NFComXmlBuilder
                             $xml .= '</IBSCBS>';
                         }
                     $xml .= '</imposto>';
+                    }else if(isset($item['impostos']['indSemCST'])){
+                        $xml .= '<imposto>';
+                            $xmç .= '<indSemCST>1</indSemCST>';
+                        $xml .= '</imposto>';
                     }
                 }
             $xml .= '</det>';
