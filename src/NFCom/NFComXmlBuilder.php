@@ -333,7 +333,7 @@ class NFComXmlBuilder
         $nNF = $dados['numero_nota'];
         $tpEmis = 1;
         $nSiteAutoriz = 0;
-        $finNFCom = 0;
+        $finNFCom = isset($dados['finNFCom']) ? $dados['finNFCom'] : 0;
         $tpFat = 0;
         $verProc = '1.0';
         $procEmi = 0;
@@ -475,6 +475,13 @@ class NFComXmlBuilder
         //     $xml .= '<NroTermPrinc>'. htmlspecialchars($dados['assinante']['CodAssinante']) .'</NroTermPrinc><cUFPrinc>'. htmlspecialchars($dados['assinante']['cUFPrinc']) .'</cUFPrinc>';
         // }
         $xml .= '</assinante>';
+
+        if($finNFCom == 3){
+            $xml .= '<gSub>';
+                $xml .= '<chNFCom>'.$dados['chNFCom'].'</chNFCom>';
+                $xml .= '<motSub>'.$dados['motSub'].'</motSub>';
+            $xml .= '</gSub>';
+        }
 
         $vProd = 0; $vBC = 0; $vICMS = 0;
         foreach ($dados['itens'] as $item) {
