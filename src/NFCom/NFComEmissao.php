@@ -56,7 +56,10 @@ class NFComEmissao
 
             // Agora carrega o XML limpo
             $xml = simplexml_load_string($cleanXml, 'SimpleXMLElement', LIBXML_NOCDATA);
-            return json_decode(json_encode($xml, JSON_UNESCAPED_UNICODE), true);
+            $resultado = json_decode(json_encode($xml, JSON_UNESCAPED_UNICODE), true);
+            //$resultado['xml_enviado_sefaz'] = $xmlAssinado;
+
+            return $resultado;
 
 
         } catch (\Exception $e) {
