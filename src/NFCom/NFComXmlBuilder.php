@@ -326,7 +326,7 @@ class NFComXmlBuilder
     {
         // Geração correta do cUF, cMunFG, dhEmi etc.
         $cUF = self::getCodigoUF($dados['emitente']['uf']);
-        $cMunFG = $dados['emitente']['codMun'];
+        $cMunFG = $dados['destinatario']['codMun'];
         $tpAmb = ($ambiente == "homologacao") ? 2 : 1;
         $mod = '62';
         $serie = 1;
@@ -390,7 +390,7 @@ class NFComXmlBuilder
             $xml .= '<nro>' . htmlspecialchars($dados['emitente']['numero']) . '</nro>';
         }
         $xml .= '<xBairro>' . htmlspecialchars($dados['emitente']['bairro']) . '</xBairro>';
-        $xml .= '<cMun>' . $cMunFG . '</cMun>';
+        $xml .= '<cMun>' . $dados['emitente']['codMun'] . '</cMun>';
         $xml .= '<xMun>' . htmlspecialchars($dados['emitente']['cidade']) . '</xMun>';
         $xml .= '<CEP>' . preg_replace('/\D/', '', $dados['emitente']['cep']) . '</CEP>';
         $xml .= '<UF>' . htmlspecialchars($dados['emitente']['uf']) . '</UF>';
