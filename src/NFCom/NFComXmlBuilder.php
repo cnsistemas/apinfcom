@@ -601,7 +601,7 @@ class NFComXmlBuilder
                                 $xml .= '<vIRRF>' . number_format($item['impostos']['retencao']['ret_irrf_val'], 2, '.', '') . '</vIRRF>';
                             $xml .= '</retTrib>';
                         }
-                        if(isset($item['impostos']['ibscbs']['cst'])){
+                        if(isset($item['impostos']['ibscbs']['cst']) && $item['impostos']['ibscbs']['cst'] != null){
                             $xml .= '<IBSCBS>';
                                 $xml .= '<CST>'.$item['impostos']['ibscbs']['cst'].'</CST>';
                                 $xml .= '<cClassTrib>'.$item['impostos']['ibscbs']['cClassTrib'].'</cClassTrib>';
