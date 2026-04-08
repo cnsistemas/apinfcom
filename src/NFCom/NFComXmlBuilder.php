@@ -655,7 +655,7 @@ class NFComXmlBuilder
             $xml .= '<vDesc>' . number_format($dados['totais']['desconto'], 2, '.', '') . '</vDesc>';
             $xml .= '<vOutro>' . number_format($dados['totais']['outros'], 2, '.', '') . '</vOutro>';
             $xml .= '<vNF>' . number_format($dados['totais']['total_nf'], 2, '.', '') . '</vNF>';
-            if(isset($dados['totais']['bc_ibs_cbs'])){
+            if(isset($dados['totais']['bc_ibs_cbs']) && $dados['totais']['bc_ibs_cbs'] > 0){
                 $xml .= '<IBSCBSTot>';
                     $xml .= '<vBCIBSCBS>' . number_format($dados['totais']['bc_ibs_cbs'], 2, '.', '') . '</vBCIBSCBS>';
                         $xml .= '<gIBS>';
