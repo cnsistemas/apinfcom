@@ -82,7 +82,10 @@ class NFComEmissao
             if(isset($dados['cstat'])){
                 $xml3 = '<protNFCom xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">
                 <infProt Id="Nfcom'.$dados['chave_acesso'].'">
+                <tpAmb>'.$dados['tpAmb'].'</tpAmb>
+                        <verAplic>'.$dados['verAplic'].'</verAplic>
                         <chNFCom>'.$dados['chave_acesso'].'</chNFCom>
+                        <dhRecbto>'.$dados['dhRecbto'].'</dhRecbto>
                         <nProt>'.$dados['nProt'].'</nProt>
                         <cStat>'.$dados['cstat'].'</cStat>
                         <xMotivo>'.$dados['xMotivo'].'</xMotivo>
