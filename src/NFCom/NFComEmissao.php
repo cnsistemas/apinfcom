@@ -132,10 +132,10 @@ class NFComEmissao
 
             // Monta o XML final
             $xmlFinal = '<?xml version="1.0" encoding="UTF-8"?>'
-                . '<NFComProc xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">'
+                . '<nfcomProc xmlns="http://www.portalfiscal.inf.br/nfcom" versao="1.00">'
                 . $xmlAssinado
                 . $protocolo
-                . '</NFComProc>';
+                . '</nfcomProc>';
             return json_decode(json_encode($xmlFinal, JSON_UNESCAPED_UNICODE), true);
 
 
