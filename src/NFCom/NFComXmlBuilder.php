@@ -658,30 +658,28 @@ class NFComXmlBuilder
             $xml .= '<vOutro>' . number_format($dados['totais']['outros'], 2, '.', '') . '</vOutro>';
             $xml .= '<vNF>' . number_format($dados['totais']['total_nf'], 2, '.', '') . '</vNF>';
             if($dados['gerar_ibs_cbs']==true){
-                if(isset($dados['totais']['bc_ibs_cbs']) && $dados['totais']['bc_ibs_cbs'] > 0){
-                    $xml .= '<IBSCBSTot>';
-                        $xml .= '<vBCIBSCBS>' . number_format($dados['totais']['bc_ibs_cbs'], 2, '.', '') . '</vBCIBSCBS>';
-                            $xml .= '<gIBS>';
-                                $xml .= '<gIBSUF>';
-                                    $xml .= '<vDif>0.00</vDif>';
-                                    $xml .= '<vDevTrib>0.00</vDevTrib>';
-                                    $xml .= '<vIBSUF>' . number_format($dados['totais']['ibs_total_uf'], 2, '.', '') . '</vIBSUF>';
-                                $xml .= '</gIBSUF>';
-                                $xml .= '<gIBSMun>';
-                                    $xml .= '<vDif>0.00</vDif>';
-                                    $xml .= '<vDevTrib>0.00</vDevTrib>';
-                                    $xml .= '<vIBSMun>' . number_format($dados['totais']['ibs_total_mun'], 2, '.', '') . '</vIBSMun>';
-                                $xml .= '</gIBSMun>';
-                                $xml .= '<vIBS>' . number_format($dados['totais']['ibs_total'], 2, '.', '') . '</vIBS>';
-                            $xml .= '</gIBS>';
-                            $xml .= '<gCBS>';
+                $xml .= '<IBSCBSTot>';
+                    $xml .= '<vBCIBSCBS>' . number_format($dados['totais']['bc_ibs_cbs'], 2, '.', '') . '</vBCIBSCBS>';
+                        $xml .= '<gIBS>';
+                            $xml .= '<gIBSUF>';
                                 $xml .= '<vDif>0.00</vDif>';
                                 $xml .= '<vDevTrib>0.00</vDevTrib>';
-                                $xml .= '<vCBS>' . number_format($dados['totais']['cbs_total'], 2, '.', '') . '</vCBS>';
-                            $xml .= '</gCBS>';
-                    $xml .= '</IBSCBSTot>';   
-                    $xml .= '<vTotDFe>' . number_format($dados['totais']['total_dfe'], 2, '.', '') . '</vTotDFe>'; 
-                }
+                                $xml .= '<vIBSUF>' . number_format($dados['totais']['ibs_total_uf'], 2, '.', '') . '</vIBSUF>';
+                            $xml .= '</gIBSUF>';
+                            $xml .= '<gIBSMun>';
+                                $xml .= '<vDif>0.00</vDif>';
+                                $xml .= '<vDevTrib>0.00</vDevTrib>';
+                                $xml .= '<vIBSMun>' . number_format($dados['totais']['ibs_total_mun'], 2, '.', '') . '</vIBSMun>';
+                            $xml .= '</gIBSMun>';
+                            $xml .= '<vIBS>' . number_format($dados['totais']['ibs_total'], 2, '.', '') . '</vIBS>';
+                        $xml .= '</gIBS>';
+                        $xml .= '<gCBS>';
+                            $xml .= '<vDif>0.00</vDif>';
+                            $xml .= '<vDevTrib>0.00</vDevTrib>';
+                            $xml .= '<vCBS>' . number_format($dados['totais']['cbs_total'], 2, '.', '') . '</vCBS>';
+                        $xml .= '</gCBS>';
+                $xml .= '</IBSCBSTot>';   
+                $xml .= '<vTotDFe>' . number_format($dados['totais']['total_dfe'], 2, '.', '') . '</vTotDFe>'; 
             }
         $xml .= '</total>';
        
