@@ -543,8 +543,15 @@ class NFComXmlBuilder
                                 $xml .= '<vICMS>' . number_format($item['impostos']['val_icms'], 2, '.', '') . '</vICMS>';
                             }
                             if($icms == 'ICMS20' || $icms == 'ICMS40' || $icms == 'ICMS51' || $icms == 'ICMS90'){
-                                $xml .= '<vICMSDeson>' . number_format($item['impostos']['vICMSDeson'], 2, '.', '') . '</vICMSDeson>';
-                                $xml .= '<cBenef>' . number_format($item['impostos']['cBenef'], 2, '.', '') . '</cBenef>';
+                                $cBenef = trim((string) ($item['impostos']['cBenef'] ?? ''));
+                                $vICMSDeson = $item['impostos']['vICMSDeson'] ?? 0;
+                                if ($vICMSDeson > 0 && $cBenef === '') {
+                                    throw new \InvalidArgumentException('Informe cBenef quando houver valor de ICMS desonerado.');
+                                }
+                                if ($cBenef !== '') {
+                                    $xml .= '<vICMSDeson>' . number_format($vICMSDeson, 2, '.', '') . '</vICMSDeson>';
+                                    $xml .= '<cBenef>' . htmlspecialchars($cBenef, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</cBenef>';
+                                }
                             }
                             if($icms != 'ICMS40' && $icms != 'ICMS51'){
                                 $xml .= '<pFCP>' . number_format($item['impostos']['pFCP'], 2, '.', '') . '</pFCP>';
